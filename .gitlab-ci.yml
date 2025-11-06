@@ -1,0 +1,41 @@
+stages:
+  - label_issue
+
+label_issue:
+  stage: label_issue
+  script:
+    - |
+      echo "Starting label_issue job"
+
+      if [ -z "$PERSONAL_ACCESS_TOKEN" ]; then
+        echo "ERROR: PERSONAL_ACCESS_TOKEN is not set or is empty"
+        exit 1
+      fi
+
+      echo "Extracting related issue from merge request description"
+      RELATED_ISSUE=$(echo "$CI_MERGE_REQUEST_DESCRIPTION" | grep -oP '(?<=#)\d+')
+      echo "Extracted RELATED_ISSUE: $RELATED_ISSUE"
+
+      if [ -n "$RELATED_ISSUE" ]; then
+        API_URL="$GITLAB_API_URL/projects/$CI_PROJECT_ID/issues/$RELATED_ISSUE"
+        echo "API_URL: $API_URL"
+
+        echo "Updating issue #$RELATED_ISSUE with label 'Ready to Test'"
+        RESPONSE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" --request PUT --header "PRIVATE-TOKEN: $PERSONAL_ACCESS_TOKEN" "$API_URL" --data "labels=Ready to Test")
+        echo "API response code: $RESPONSE"
+
+        if [ "$RESPONSE" -eq 200 ]; then
+          echo "Issue #$RELATED_ISSUE labeled as 'Ready to Test'"
+        else
+          echo "ERROR: Failed to update issue #$RELATED_ISSUE: $RESPONSE"
+        fi
+      else
+        echo "No related issue found in the merge request description. Continuing without labeling."
+      fi
+    - echo "label_issue job completed"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+
+variables:
+  GITLAB_API_URL: "https://gitlab.cubicloud.id/api/v4"
