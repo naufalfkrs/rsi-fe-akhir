@@ -7,7 +7,7 @@ export const sidebarItems: NavMenuItems = [
     description: 'Informasi terkait profilmu',
     icon: 'basil:document-outline',
     route: '/dashboard/profile',
-    // permission: ['letter.create'],
+    // permission: ['letter.created'],
     type: 'header',
   },
   {
