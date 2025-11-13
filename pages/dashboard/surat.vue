@@ -654,7 +654,7 @@ onMounted(async () => {
 
 definePageMeta({
   layout: "dashboard",
-  middleware: ["auth", "permission"],
+  
 });
 
 const showDialog = ref(false);

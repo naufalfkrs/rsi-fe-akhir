@@ -6,6 +6,7 @@
       <div class="flex flex-col">
         <Header v-if="isUserLoggedIn()" />
         <main class="flex-1 p-4 lg:p-6" :class="isBgWhite ? 'bg-background' : 'bg-[#FBFBFD] dark:bg-muted/20'">
+        <!-- <main class="flex-1 p-4 lg:p-6 bg-background"> -->
           <NuxtPage />
         </main>
       </div>

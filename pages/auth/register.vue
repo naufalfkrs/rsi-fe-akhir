@@ -1,56 +1,60 @@
 <template>
   <div class="flex items-center justify-center min-h-screen bg-gray-100 font-montserrat">
     <div class="flex w-full max-w-4xl bg-white rounded-md shadow-md h-[550px] items-center">
-      <div class="flex flex-col justify-center items-center w-1/2 bg-purple-100 p-8 h-full">
+      <div class="flex flex-col justify-center items-center w-1/2 bg-green-100 p-8 h-full">
         <div class="flex flex-col items-center w-1/2">
-          <img src="/logo.png" alt="" />
-          <h1 class="text-4xl font-bold text-purple-800">E-Office</h1>
+          <!-- <img src="/logo.png" alt="" /> -->
+          <!-- <h1 class="text-4xl font-bold text-purple-800">E-Office</h1> -->
         </div>
       </div>
       <div class="w-1/2 p-8">
-        <h2 class="mb-2 text-3xl font-bold text-center text-gray-700">Create Your Account</h2>
+        <h2 class="mb-2 text-2xl font-bold text-left text-black">Ayo gabung <span class=" text-customGreen">Agrommerce</span></h2>
         <!-- <p class="mb-4 text-center text-gray-600">Join us and enhance your office efficiency.</p> -->
         <div v-if="alertMessage.length > 0" :class="`mb-4 p-4 text-sm text-white rounded-md ${alertType === 'success' ? 'bg-green-500' : 'bg-red-500'}`">
           <p v-for="(message, index) in alertMessage" :key="index">{{ message }}</p>
         </div>
         <form @submit.prevent="register">
-          <div class="mb-4">
-            <label class="block mb-2 text-sm font-medium text-gray-600">Full Name</label>
-            <input type="text" placeholder="Enter your name" v-model="name" class="w-full px-4 py-2 border rounded-md text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500" required />
+          <div class="mt-4 mb-2">
+            <input type="text" placeholder="Masukkan Nama Lengkap" v-model="name" class="w-full px-4 py-2 border rounded-md text-gray-600 focus:outline-none focus:ring-2 focus:ring-customGreen" required />
           </div>
-          <div class="mb-4">
-            <label class="block mb-2 text-sm font-medium text-gray-600">Email Address</label>
-            <input type="email" placeholder="Enter your email" v-model="email" class="w-full px-4 py-2 border rounded-md text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500" required />
+          <div class="mb-2">
+            <input type="text" placeholder="Masukkan Alamat" v-model="alamat" class="w-full px-4 py-2 border rounded-md text-gray-600 focus:outline-none focus:ring-2 focus:ring-customGreen" required />
           </div>
-          <div class="mb-6">
-            <label class="block mb-2 text-sm font-medium text-gray-600">Password</label>
-            <div class="relative">
-              <input :type="showPassword ? 'text' : 'password'" placeholder="Create a password" v-model="password" class="w-full px-4 py-2 border text-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" required />
-              <button type="button" class="absolute inset-y-0 right-0 px-3 py-2" @click="togglePasswordVisibility" :class="{ 'text-purple-500': showPassword, 'text-gray-400': !showPassword }">
-                <Icon name="mdi:eye-outline" class="w-5 h-5" v-if="!showPassword" />
-                <Icon name="mdi:eye-off-outline" class="w-5 h-5" v-else />
-              </button>
-            </div>
-          </div>
-          <div class="mb-6">
-            <label class="block mb-2 text-sm font-medium text-gray-600">Phone Number</label>
+          <div class="mb-2">
             <input
               type="text"
-              placeholder="Enter your phone number"
+              placeholder="Masukkan No. HP"
               v-model="phone_number"
               @input="restrictToNumbers"
-              class="w-full px-4 py-2 border rounded-md text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              class="w-full px-4 py-2 border rounded-md text-gray-600 focus:outline-none focus:ring-2 focus:ring-customGreen"
               required
             />
           </div>
-          <button type="submit" class="w-full py-2 px-4 bg-purple-700 text-white rounded-md hover:bg-purple-600" :disabled="isLoading">
+          <div class="mb-2">
+            <input type="email" placeholder="Masukkan E-mail" v-model="email" class="w-full px-4 py-2 border rounded-md text-gray-600 focus:outline-none focus:ring-2 focus:ring-customGreen" required />
+          </div>
+          <div class="mb-2">
+            <div class="relative">
+              <input type="password" placeholder="Masukkan Password" v-model="password" class="w-full px-4 py-2 border text-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-customGreen" required />
+            </div>
+          </div>
+          <div class="mb-6">
+            <div class="relative">
+              <input type="password" placeholder="Konfirmasi Password" v-model="confirm_password" class="w-full px-4 py-2 border text-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-customGreen" required />
+            </div>
+          </div>
+          
+          <button type="submit" class="w-full py-2 px-4 bg-customGreen text-white rounded-md hover:bg-customDarkGreen" :disabled="isLoading">
             <span v-if="isLoading">
               <Spinner />
             </span>
-            <span v-else>Register Now</span>
+            <span v-else class="font-bold">Daftar</span>
           </button>
         </form>
-        <p class="mt-4 text-sm text-center text-gray-600">Already have an account? <nuxt-link to="/auth/login" class="text-purple-500">Log in here</nuxt-link></p>
+        <p class="mt-4 text-sm text-center text-gray-600 font-bold">Sudah punya akun? <nuxt-link to="/auth/login" class="text-customGreen">Masuk</nuxt-link></p>
+
+        <p class="mt-4 text-xs text-center text-gray-600 font-medium">Dengan mendaftar, saya menyetujui 
+          <p><span class="text-customGreen">Syarat & Ketentuan</span> serta <span class="text-customGreen">Kebijakan Privasi</span> Agrommerce</p></p>
       </div>
     </div>
   </div>

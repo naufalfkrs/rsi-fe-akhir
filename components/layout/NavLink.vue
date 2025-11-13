@@ -23,9 +23,10 @@ const { isOpen } = storeToRefs(useNavbar());
             :aria-label="item.name"
           >
             <Icon v-if="item.icon" :name="item.icon" :class="cn('size-5', item?.color)" />
-            <span v-if="isOpen" class="hidden text-base lg:inline-block">
-              {{ item.name }}
-            </span>
+            <div v-if="isOpen" class="hidden flex-col lg:flex text-left leading-tight">
+              <span class="text-base">{{ item.name }}</span>
+              <span v-if="item.description" class="text-xs text-gray-400">{{ item.description }}</span>
+            </div>
           </Button>
         </NuxtLink>
       </TooltipTrigger>

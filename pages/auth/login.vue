@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useToast } from 'vue-toastification';
 import Spinner from '~/components/Spinner.vue';
-import { useAuthStore } from '~/composables/useAuth';
+// import { useAuthStore } from '~/composables/useAuth';
 
 const router = useRouter();
 
@@ -12,22 +12,31 @@ const isLoading = ref<boolean>(false);
 const authStore = useAuthStore();
 const toast = useToast();
 
-const { $api } = useNuxtApp();
+// const { $api } = useNuxtApp();
 
 const login = async () => {
   isLoading.value = true;
   try {
-    const response = await $api.post(`/v1/auth/login`, {
-      email: email.value,
-      password: password.value,
-    });
-    const token = response.data.data.access_token;
-    authStore.setToken(token);
-    await authStore.fetchUserPermissions();
-    router.push('/dashboard/surat');
+    // const response = await $api.post(`/v1/auth/login`, {
+    //   email: email.value,
+    //   password: password.value,
+    // });
+    // const token = response.data.data.access_token;
+    // authStore.setToken(token);
+    // await authStore.fetchUserPermissions();
+    await new Promise(resolve => setTimeout(resolve, 1000)) // delay 1 detik biar realistis
+
+    if (email.value === 'admin@mail.com' && password.value === 'rahasia123') {
+      toast.success('Login berhasil! Selamat datang kembali 👋')
+      router.push('/dashboard')
+    } else {
+      toast.error('Email atau password salah!')
+    }
+    // router.push('/dashboard/surat');
   } catch (error) {
     console.error('Login failed:', error);
-    toast.error('Login failed. Please check your email and password.');
+    // toast.error('Login failed. Please check your email and password.');
+    toast.error('Terjadi kesalahan saat login.');
   } finally {
     isLoading.value = false;
   }
@@ -39,32 +48,31 @@ const togglePasswordVisibility = () => {
 </script>
 
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-gray-100 font-montserrat">
+  <div class="flex items-center justify-center min-h-screen bg-background font-montserrat">
     <div class="flex w-full max-w-4xl bg-white rounded-md shadow-md h-[550px] items-center">
-      <div class="flex flex-col justify-center items-center w-1/2 bg-purple-100 p-8 h-full">
+      <div class="flex flex-col justify-center items-center w-1/2 bg-green-100 p-8 h-full">
         <div class="flex flex-col items-center w-1/2">
-          <img src="/logo.png" alt="" />
-          <h1 class="text-4xl font-bold text-purple-800">E-Office</h1>
+          <!-- <img src="/logo.png" alt="" /> -->
+          <!-- <h1 class="text-4xl font-bold text-purple-800">E-Office</h1> -->
         </div>
       </div>
       <div class="w-1/2 p-8">
-        <h2 class="text-3xl font-bold text-center text-gray-700">Welcome Back!</h2>
-        <p class="mb-6 text-sm text-center text-gray-500">Please enter your details to log in.</p>
+        <h2 class="text-3xl font-bold text-left text-black">Login ke <span class=" text-customGreen">Agrommerce</span></h2>
         <form @submit.prevent="login">
+          <br>
           <div class="mb-4">
-            <label class="block mb-2 text-sm font-medium text-gray-600">Email</label>
-            <input type="email" placeholder="Enter your email" v-model="email" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600" required />
+            <input type="email" placeholder="Masukkan E-mail" v-model="email" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-customGreen text-gray-600" required />
           </div>
+          <!-- <br> -->
           <div class="mb-6">
-            <label class="block mb-2 text-sm font-medium text-gray-600">Password</label>
             <div class="relative">
-              <input :type="showPassword ? 'text' : 'password'" placeholder="Enter your password" v-model="password" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600" required />
+              <input :type="showPassword ? 'text' : 'password'" placeholder="Masukkan Password" v-model="password" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-customGreen text-gray-600" required />
               <button
                 type="button"
                 class="absolute flex items-center inset-y-0 right-0 px-3 py-2"
                 @click="togglePasswordVisibility"
                 :class="{
-                  'text-blue-500': showPassword,
+                  'text-customGreen': showPassword,
                   'text-gray-400': !showPassword,
                 }"
               >
@@ -73,16 +81,16 @@ const togglePasswordVisibility = () => {
               </button>
             </div>
           </div>
-          <button type="submit" class="w-full py-2 px-4 bg-purple-700 text-white rounded-md hover:bg-purple-600" :disabled="isLoading">
+          <button type="submit" class="w-full py-2 px-4 bg-customGreen text-white rounded-md hover:bg-customDarkGreen" :disabled="isLoading">
             <span v-if="isLoading">
               <Spinner />
             </span>
-            <span v-else>Sign In</span>
+            <span v-else class="font-bold">Masuk</span>
           </button>
         </form>
-        <p class="mt-4 text-sm text-center text-gray-600">
-          Don't have an account?
-          <nuxt-link to="/auth/register" class="text-purple-500">Register</nuxt-link>
+        <p class="mt-4 text-sm text-center text-gray-600 font-bold">
+          Belum punya akun?
+          <nuxt-link to="/auth/register" class="text-customGreen">Daftar</nuxt-link>
         </p>
       </div>
     </div>
