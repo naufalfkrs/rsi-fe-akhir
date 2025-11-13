@@ -1,5 +1,6 @@
 export interface NavLink {
   name: string;
+  description: string;
   icon: string;
   route: string;
   permission?: string[];
@@ -14,6 +15,7 @@ export interface NavSectionTitle {
 
 export interface NavGroup {
   name: string;
+  description: string;
   icon: string;
   route: string;
   permission?: string[];
