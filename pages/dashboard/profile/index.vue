@@ -13,6 +13,8 @@ interface Product {
 
 const latestProducts = ref<Product[]>([]);
 const navbar = useNavbar();
+const showPassword1 = ref(false); // untuk input "kata sandi baru"
+const showPassword2 = ref(false); // untuk input "konfirmasi sandi baru"
 
 const contentMargin = computed(() => (navbar.isOpen ? 'ml-64' : 'ml-20'));
 // onMounted(() => {
@@ -31,6 +33,25 @@ onMounted(() => {
 definePageMeta({
     layout: "dashboard",
 });
+
+const showPasswordModal = ref(false);
+
+function openPasswordModal() {
+  showPasswordModal.value = true;
+}
+
+function closePasswordModal() {
+  showPasswordModal.value = false;
+}
+
+function togglePassword1() {
+  showPassword1.value = !showPassword1.value;
+}
+
+function togglePassword2() {
+  showPassword2.value = !showPassword2.value;
+}
+
 </script>
 
 <template>
@@ -60,9 +81,10 @@ definePageMeta({
             </div>
 
             <button
+              @click="openPasswordModal"
               class="mt-6 w-full bg-customGreen hover:bg-customDarkGreen text-white py-3 rounded-lg font-semibold transition"
             >
-              Edit Profil
+              Ubah Kata Sandi
             </button>
           </div>
 
@@ -117,6 +139,88 @@ definePageMeta({
           </div>
         </div>
       </div>
+
+      <!-- =================== MODAL UBAH PASSWORD =================== -->
+      <div
+        v-if="showPasswordModal"
+        class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+        @click.self="closePasswordModal"
+      >
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-md p-6 relative">
+
+          <!-- Tombol X -->
+          <button
+            class="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            @click="closePasswordModal"
+          >
+            ✕
+          </button>
+
+          <!-- Title -->
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">
+            Ubah Kata Sandi
+          </h2>
+
+          <!-- Form -->
+          <form class="space-y-4">
+
+            <!-- PASSWORD 1 -->
+            <div class="relative">
+              <label class="block text-gray-700 mb-1">Kata Sandi Baru</label>
+
+              <input
+                :type="showPassword1 ? 'text' : 'password'"
+                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-green-200 pr-12"
+                placeholder="Masukkan kata sandi baru"
+              />
+
+              <!-- Icon Mata -->
+              <button
+                type="button"
+                class="absolute inset-y-0 right-3 flex items-center mt-7"
+                @click="togglePassword1"
+                :class="showPassword1 ? 'text-customGreen' : 'text-gray-400'"
+              >
+                <Icon v-if="!showPassword1" name="mdi:eye-outline" class="w-5 h-5" />
+                <Icon v-else name="mdi:eye-off-outline" class="w-5 h-5" />
+              </button>
+            </div>
+
+            <!-- PASSWORD 2 -->
+            <div class="relative">
+              <label class="block text-gray-700 mb-1">Konfirmasi Sandi Baru</label>
+
+              <input
+                :type="showPassword2 ? 'text' : 'password'"
+                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-green-200 pr-12"
+                placeholder="Konfirmasi kata sandi baru"
+              />
+
+              <!-- Icon Mata -->
+              <button
+                type="button"
+                class="absolute inset-y-0 right-3 flex items-center mt-7"
+                @click="togglePassword2"
+                :class="showPassword2 ? 'text-customGreen' : 'text-gray-400'"
+              >
+                <Icon v-if="!showPassword2" name="mdi:eye-outline" class="w-5 h-5" />
+                <Icon v-else name="mdi:eye-off-outline" class="w-5 h-5" />
+              </button>
+            </div>
+
+            <!-- Button Submit -->
+            <button
+              type="submit"
+              class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md font-medium"
+            >
+              Simpan
+            </button>
+
+          </form>
+        </div>
+      </div>
+      <!-- ================= END MODAL ================= -->
+
     </main>
   </div>
 </template>
