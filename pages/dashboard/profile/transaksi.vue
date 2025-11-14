@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import Sidebar from '~/components/layout/Sidebar.vue';
+import Sidebar from '~/components/layout/Sidebar_profile.vue';
+import Header from '~/components/layout/Header.vue';
 import { useNavbar } from '~/stores/navbar';
 
 interface Product {
@@ -31,6 +32,7 @@ definePageMeta({
 
 <template>
   <div>
+    <Header />
     <Sidebar />
     <main
       :class="[
