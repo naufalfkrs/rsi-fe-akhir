@@ -78,8 +78,7 @@ const totalPrice = computed(() =>
             :key="item.id"
             class="bg-white shadow rounded-lg p-4 flex items-center gap-4"
           >
-            <!-- LEFT - IMAGE (1/8) -->
-            <div class="w-1/8">
+            <div class="">
               <img
                 :src="item.imageUrl"
                 :alt="item.name"
@@ -87,15 +86,13 @@ const totalPrice = computed(() =>
               />
             </div>
 
-            <!-- CENTER - NAME (5/8) -->
-            <div class="w-5/8">
+            <div class="w-4/6">
               <h2 class="text-lg font-semibold text-gray-800">
                 {{ item.name }}
               </h2>
             </div>
 
-            <!-- RIGHT - PRICE + ACTIONS (2/8) -->
-            <div class="w-2/8 flex flex-col items-end text-right">
+            <div class="w-2/6 flex flex-col items-end">
               <!-- PRICE -->
               <p class="font-bold text-customGreen mb-2">
                 Rp {{ (item.price * item.quantity).toLocaleString() }}

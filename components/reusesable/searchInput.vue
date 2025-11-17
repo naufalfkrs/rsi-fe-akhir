@@ -11,15 +11,15 @@ const updateValue = (event: Event) => {
 </script>
 
 <template>
-  <div class="relative w-[650px] h-[35px] items-center ">
+  <div class="relative w-[800px] h-[35px] items-center ">
     <Input
       id="search"
       type="search"
       placeholder="Cari sesuatu..."
       @input="updateValue"
-      class="pl-10 w-full h-full rounded-md border border-gray-300 focus:ring-2 focus:ring-customGreen"
+      class="pr-10 w-full h-full rounded-md border border-gray-300 focus:ring-2 focus:ring-customGreen focus:border-customGreen"
     />
-    <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
+    <span class="absolute right-2 inset-y-0 flex items-center justify-center">
       <SearchIcon class="size-6 text-gray-500" />
     </span>
   </div>

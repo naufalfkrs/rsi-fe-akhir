@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import Header from "~/components/layout/Header.vue";
 import Search from "~/components/reusesable/searchInput.vue";
 
@@ -8,38 +8,71 @@ interface Product {
   name: string;
   imageUrl: string;
   price: number;
+  category: string;
 }
+const searchQuery = ref("");
 
 const latestProducts = ref<Product[]>([]);
+const currentCategory = ref("semua");
 
-// simulasi pengambilan data
+const priceMin = ref("");
+const priceMax = ref("");
+
+const sortBy = ref("terbaru");
+
 onMounted(() => {
   latestProducts.value = [
-    { id: 1, name: "Sayur Sawi Hijau",imageUrl: "/images/sawi.jpg", price: 12000,},
-    { id: 2, name: "Tomat Segar", imageUrl: "/images/tomat.jpg", price: 15000 },
-    { id: 3, name: "Wortel Organik", imageUrl: "/images/wortel.jpg", price: 18000,},
-    { id: 4, name: "Sayur Sawi Hijau",imageUrl: "/images/sawi.jpg", price: 12000,},
-    { id: 5, name: "Tomat Segar", imageUrl: "/images/tomat.jpg", price: 15000 },
-    { id: 6, name: "Wortel Organik", imageUrl: "/images/wortel.jpg", price: 18000,},
-    { id: 7, name: "Sayur Sawi Hijau",imageUrl: "/images/sawi.jpg", price: 12000,},
-    { id: 8, name: "Tomat Segar", imageUrl: "/images/tomat.jpg", price: 15000 },
-    { id: 9, name: "Wortel Organik", imageUrl: "/images/wortel.jpg", price: 18000,},
-    { id: 10, name: "Sayur Sawi Hijau",imageUrl: "/images/sawi.jpg", price: 12000,},
-    { id: 11, name: "Tomat Segar", imageUrl: "/images/tomat.jpg", price: 15000 },
-    { id: 12, name: "Wortel Organik", imageUrl: "/images/wortel.jpg", price: 18000,},
-    { id: 13, name: "Sayur Sawi Hijau",imageUrl: "/images/sawi.jpg", price: 12000,},
-    { id: 14, name: "Tomat Segar", imageUrl: "/images/tomat.jpg", price: 15000 },
-    { id: 15, name: "Wortel Organik", imageUrl: "/images/wortel.jpg", price: 18000,},
-    { id: 16, name: "Sayur Sawi Hijau",imageUrl: "/images/sawi.jpg", price: 12000,},
-    { id: 17, name: "Tomat Segar", imageUrl: "/images/tomat.jpg", price: 15000 },
-    { id: 18, name: "Wortel Organik", imageUrl: "/images/wortel.jpg", price: 18000,},
-    
+    { id: 1, name: "Sayur Sawi Hijau", imageUrl: "/images/sawi.jpg", price: 12000, category: "sayur" },
+    { id: 2, name: "Tomat Segar", imageUrl: "/images/tomat.jpg", price: 15000, category: "sayur" },
+    { id: 3, name: "Wortel Organik", imageUrl: "/images/wortel.jpg", price: 18000, category: "sayur" },
+    { id: 4, name: "Jeruk Manis", imageUrl: "/images/tomat.jpg", price: 11000, category: "buah" },
+    { id: 5, name: "Cabe Rawit", imageUrl: "/images/wortel.jpg", price: 9000, category: "rempah" },
+    { id: 6, name: "Kentang Segar", imageUrl: "/images/sawi.jpg", price: 14000, category: "umbi" },
+    { id: 7, name: "Kacang Hijau", imageUrl: "/images/tomat.jpg", price: 17000, category: "biji" },
+    { id: 8, name: "Telur Ayam Kampung", imageUrl: "/images/wortel.jpg", price: 28000, category: "hewani" },
+    { id: 9, name: "Sayur Sawi Hijau", imageUrl: "/images/sawi.jpg", price: 12000, category: "sayur" },
+    { id: 10, name: "Tomat Segar", imageUrl: "/images/tomat.jpg", price: 15000, category: "sayur" },
+    { id: 11, name: "Wortel Organik", imageUrl: "/images/wortel.jpg", price: 18000, category: "sayur" },
+    { id: 12, name: "Jeruk Manis", imageUrl: "/images/tomat.jpg", price: 11000, category: "buah" },
+    { id: 13, name: "Cabe Rawit", imageUrl: "/images/wortel.jpg", price: 9000, category: "rempah" },
+    { id: 14, name: "Kentang Segar", imageUrl: "/images/sawi.jpg", price: 14000, category: "umbi" },
+    { id: 15, name: "Kacang Hijau", imageUrl: "/images/tomat.jpg", price: 17000, category: "biji" },
+    { id: 16, name: "Telur Ayam Kampung", imageUrl: "/images/wortel.jpg", price: 28000, category: "hewani" },
+    // tambahkan sisanya...
   ];
 });
 
-const goToDetail = (id: number) => {
-  navigateTo(`/dashboard/produk/${id}`);
-};
+// FILTER KATEGORI
+const filteredProducts = computed(() => {
+  let items = latestProducts.value;
+
+
+  if (currentCategory.value !== "semua") {
+    items = items.filter(p => p.category === currentCategory.value);
+  }
+
+  if (priceMin.value !== "") {
+    items = items.filter(p => p.price >= Number(priceMin.value));
+  }
+
+  if (priceMax.value !== "") {
+    items = items.filter(p => p.price <= Number(priceMax.value));
+  }
+
+  if (searchQuery.value.trim() !== "") {
+    items = items.filter(p =>
+      p.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    );
+  }
+
+  if (sortBy.value === "termurah") {
+    items.sort((a, b) => a.price - b.price);
+  } else if (sortBy.value === "termahal") {
+    items.sort((a, b) => b.price - a.price);
+  }
+
+  return items;
+});
 
 // PAGINATION
 const currentPage = ref(1);
@@ -47,17 +80,30 @@ const itemsPerPage = 15;
 
 // TOTAL HALAMAN
 const totalPages = computed(() =>
-  Math.ceil(latestProducts.value.length / itemsPerPage)
+  Math.ceil(filteredProducts.value.length / itemsPerPage)
 );
 
-// DATA YANG DITAMPILKAN PADA HALAMAN SEKARANG
 const paginated = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return latestProducts.value.slice(start, end);
+  return filteredProducts.value.slice(start, start + itemsPerPage);
 });
 
-// NEXT / PREV
+// Smart Page Numbers
+const getPages = computed(() => {
+  const pages = [];
+  const total = totalPages.value;
+  const current = currentPage.value;
+
+  let start = Math.max(1, current - 1);
+  let end = Math.min(total, current + 1);
+
+  if (current === 1) end = Math.min(3, total);
+  if (current === total) start = Math.max(1, total - 2);
+
+  for (let i = start; i <= end; i++) pages.push(i);
+  return pages;
+});
+
 const nextPage = () => {
   if (currentPage.value < totalPages.value) currentPage.value++;
 };
@@ -66,46 +112,79 @@ const prevPage = () => {
   if (currentPage.value > 1) currentPage.value--;
 };
 
-const getPages = computed(() => {
-  const pages = [];
-  const total = totalPages.value;
-  const current = currentPage.value;
-
-  // Selalu tampilkan 3 nomor: current-1, current, current+1
-  let start = Math.max(1, current - 1);
-  let end = Math.min(total, current + 1);
-
-  // Jika di awal (page 1)
-  if (current === 1) {
-    start = 1;
-    end = Math.min(3, total);
-  }
-
-  // Jika di akhir (page terakhir)
-  if (current === total) {
-    end = total;
-    start = Math.max(1, total - 2);
-  }
-
-  for (let i = start; i <= end; i++) {
-    pages.push(i);
-  }
-
-  return pages;
-});
-
+const goToDetail = (id: number) =>
+  navigateTo(`/dashboard/produk/${id}`);
 </script>
+
 
 <template>
   <!-- <div class="bg-gray-100"> -->
   <div>
     <Header />
     <main class="max-w-[90%] mx-auto py-8">
-      <h1 class="text-2xl font-semibold  text-customGreen pt-6 flex justify-center">Temukan Hasil Panen Segar Terbaik</h1>
+      <h1 class="text-2xl font-semibold  text-customGreen flex justify-center">Temukan Hasil Panen Segar Terbaik</h1>
       <p class="flex justify-center mb-6 ">Jelajahi dan dapatkan komoditas pertanian kualitas unggulan langsung dari sumbernya</p>    
     
       <div class="flex justify-center mb-8">
-        <Search />
+        <Search v-model="searchQuery" />
+      </div>
+
+      <!-- CATEGORY BUTTONS -->
+      <div class="flex justify-center gap-3 mb-8">
+        <button
+          v-for="cat in [
+            { label: 'Semua', value: 'semua' },
+            { label: 'Sayur Mayur', value: 'sayur' },
+            { label: 'Buah Buahan', value: 'buah' },
+            { label: 'Rerempahan', value: 'rempah' },
+            { label: 'Umbi Umbian', value: 'umbi' },
+            { label: 'Biji Bijian', value: 'biji' },
+            { label: 'Hewani', value: 'hewani' },
+          ]"
+          :key="cat.value"
+          @click="currentCategory = cat.value; currentPage = 1"
+          :class="[
+            'px-4 py-2 rounded-full text-sm border transition',
+            currentCategory === cat.value
+              ? 'bg-green-600 text-white border-green-600'
+              : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100',
+          ]"
+        >
+          {{ cat.label }}
+        </button>
+      </div>
+
+      <!-- FILTER + SORTING -->
+      <div class="flex justify-end items-center gap-4 mb-6">
+
+        <!-- MIN PRICE -->
+        <input
+            type="number"
+            placeholder="Rp ...."
+            v-model="priceMin"
+            class="px-3 py-2 border rounded-md w-32"
+        />
+
+        <span>-</span>
+
+        <!-- MAX PRICE -->
+        <input
+            type="number"
+            placeholder="Rp ...."
+            v-model="priceMax"
+            class="px-3 py-2 border rounded-md w-32"
+        />
+
+        <!-- SORTING DROPDOWN -->
+        <select
+            v-model="sortBy"
+            class="px-3 py-2 border rounded-md"
+        >
+            <option value="terbaru">Terbaru</option>
+            <option value="terlaris">Terlaris</option>
+            <option value="termurah">Harga Termurah</option>
+            <option value="termahal">Harga Termahal</option>
+        </select>
       </div>
 
 
