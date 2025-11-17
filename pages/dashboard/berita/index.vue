@@ -129,7 +129,7 @@ onMounted(() => {
 
 // NAVIGATE DETAIL
 const goToDetail = (id: number) => {
-  navigateTo(`/berita/${id}`);
+  navigateTo(`/dashboard/berita/${id}`);
 };
 
 // Format tanggal + waktu sesuai permintaan
