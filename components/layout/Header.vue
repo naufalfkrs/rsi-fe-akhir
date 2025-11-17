@@ -41,10 +41,19 @@ onMounted(() => {
     <nav class="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-10">
       <ul class="flex items-center space-x-10">
         <li>
-          <Search />
+          <!-- <Search /> -->
+          <nuxt-link to="/dashboard/" class="text-white hover:text-gray-200 ml-5 mr-5" active-class="font-semibold">
+            Beranda
+          </nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/dashboard/berita" class="text-white hover:text-gray-200 ml-5 mr-5" active-class="font-semibold">
+          <!-- <Search /> -->
+          <nuxt-link to="/dashboard/produk/" class="text-white hover:text-gray-200 ml-5 mr-5" active-class="font-semibold">
+            Produk
+          </nuxt-link>
+        </li>
+        <li>
+          <nuxt-link to="/dashboard/berita/" class="text-white hover:text-gray-200 ml-5 mr-5" active-class="font-semibold">
             Berita
           </nuxt-link>
         </li>
