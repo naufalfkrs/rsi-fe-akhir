@@ -68,7 +68,7 @@ onMounted(() => {
             <Icon name="line-md:moon-alt-loop" size="24" v-else />
           </Button> -->
           <!-- <div class="border-x-[1px] border-gray-300 h-[24px] w-[1px] mx-2"></div> -->
-          <nuxt-link to="/dashboard/berita" class="text-white hover:text-gray-200" active-class="font-semibold">
+          <nuxt-link to="/dashboard/keranjang" class="text-white hover:text-gray-200" active-class="font-semibold">
             <ShoppingCart class="w-6 h-6" />
           </nuxt-link>
           <nuxt-link to="/dashboard/profile" class="border-0 bg-transparent hover:bg-transparent text-white shadow-none flex items-center max-w-[200px] w-full justify-start ml-6">
