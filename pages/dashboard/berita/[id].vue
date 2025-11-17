@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import Header from "~/components/layout/Header.vue";
 import { useRoute } from "vue-router";
 
@@ -54,7 +54,12 @@ onMounted(() => {
   newsDetail.value = newsList.value.find((n) => n.id === newsId) || null;
 });
 
-// Format tanggal menjadi: "30 Januari 2025, 11:30 WIB"
+// ⭐ FILTER: Semua berita kecuali ID yang sedang dibuka
+const otherNews = computed(() =>
+  newsList.value.filter((n) => n.id !== newsId)
+);
+
+// Format tanggal
 const formatDateTime = (dateString: string) => {
   const date = new Date(dateString);
 
@@ -111,7 +116,7 @@ const goToDetail = (id: number) => {
         <h2 class="text-xl font-bold mb-2 text-gray-800">Berita Lainnya</h2>
 
         <div
-          v-for="n in newsList"
+          v-for="n in otherNews"
           :key="n.id"
           @click="goToDetail(n.id)"
           class="flex bg-white rounded-lg shadow-md p-3 gap-3 cursor-pointer hover:shadow-lg transition"
