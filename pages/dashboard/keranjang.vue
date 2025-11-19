@@ -3,58 +3,109 @@ import { ref, onMounted } from "vue";
 import Header from "~/components/layout/Header.vue";
 
 interface CartItem {
-  id: number;
-  name: string;
-  imageUrl: string;
-  price: number;
-  quantity: number;
+  id_detail_pesanan: number;
+  nama_produk: string;
+  foto_produk: string;
+  harga_produk_tersimpan: number;
+  berat_produk: number;
+  kuantitas_produk: number;
 }
 
 const cartItems = ref<CartItem[]>([]);
+const { $api } = useNuxtApp();
 
-onMounted(() => {
-  cartItems.value = [
-    {
-      id: 1,
-      name: "Sayur Sawi Hijau",
-      imageUrl: "/logo.png",
-      price: 12000,
-      quantity: 1,
-    },
-    {
-      id: 2,
-      name: "Tomat Segar",
-      imageUrl: "/images/tomat.jpg",
-      price: 15000,
-      quantity: 2,
-    },
-    {
-      id: 3,
-      name: "Wortel Organik",
-      imageUrl: "/images/wortel.jpg",
-      price: 18000,
-      quantity: 1,
-    },
-  ];
+// onMounted(() => {
+//   cartItems.value = [
+//     {
+//       id: 1,
+//       name: "Sayur Sawi Hijau",
+//       imageUrl: "/logo.png",
+//       price: 12000,
+//       quantity: 1,
+//     },
+//     {
+//       id: 2,
+//       name: "Tomat Segar",
+//       imageUrl: "/images/tomat.jpg",
+//       price: 15000,
+//       quantity: 2,
+//     },
+//     {
+//       id: 3,
+//       name: "Wortel Organik",
+//       imageUrl: "/images/wortel.jpg",
+//       price: 18000,
+//       quantity: 1,
+//     },
+//   ];
+// });
+onMounted(async () => {
+  try {
+    const res = await $api.get("http://127.0.0.1:8000/api/user/keranjang");
+
+    if (!res.data.data) {
+      cartItems.value = [];
+      return;
+    }
+
+    // backend mengembalikan:
+    // data: { detail_pesanans: [...] }
+    cartItems.value = res.data.data.detail_pesanans.map((item: any) => ({
+      id_detail_pesanan: item.id_detail_pesanan,
+      id_produk: item.produk.id_produk,
+      nama_produk: item.produk.nama_produk,
+      foto_produk: item.produk.foto_produk,
+      harga_produk_tersimpan: Number(item.harga_produk_tersimpan),
+      berat_produk: Number(item.produk.berat_produk),
+      kuantitas_produk: item.kuantitas_produk,
+    }));
+
+  } catch (error) {
+    console.error("Gagal memuat keranjang:", error);
+  }
 });
 
-const increaseQty = (item: CartItem) => {
-  item.quantity++;
-};
-const decreaseQty = (item: CartItem) => {
-  if (item.quantity > 1) item.quantity--;
+const updateQty = async (item: CartItem) => {
+  try {
+    await $api.put(
+      `http://127.0.0.1:8000/api/user/keranjang/${item.id_detail_pesanan}`,
+      { kuantitas: item.kuantitas_produk }
+    );
+  } catch (err) {
+    console.error("Gagal update jumlah:", err);
+  }
 };
 
-const removeItem = (id: number) => {
-  cartItems.value = cartItems.value.filter((i) => i.id !== id);
+const increaseQty = (item: any) => {
+  item.kuantitas_produk++;
+  updateQty(item);
+};
+
+const decreaseQty = (item: any) => {
+  if (item.kuantitas_produk > 1) {
+    item.kuantitas_produk--;
+    updateQty(item);
+  }
+};
+
+const removeItem = async (id_detail: number) => {
+  try {
+    await $api.delete(`http://127.0.0.1:8000/api/user/keranjang/${id_detail}`);
+    cartItems.value = cartItems.value.filter((i) => i.id_detail_pesanan !== id_detail);
+  } catch (error) {
+    console.error("Gagal hapus item:", error);
+  }
 };
 
 const totalPrice = computed(() =>
   cartItems.value.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + item.harga_produk_tersimpan * item.kuantitas_produk,
     0
   )
 );
+
+const goToDetail = (id_detail: number) => navigateTo(`/dashboard/produk/${id_detail}`);
+
 definePageMeta({
   middleware: 'auth'
 });
@@ -78,34 +129,34 @@ definePageMeta({
           <!-- LIST ITEM -->
           <div
             v-for="item in cartItems"
-            :key="item.id"
-            class="bg-white shadow rounded-lg p-4 flex items-center gap-4"
+            :key="item.id_detail_pesanan"
+            class="bg-white shadow rounded-lg p-4 overflow-hidden hover:shadow-lg transition cursor-pointer flex items-center gap-4"
           >
             <div class="">
               <img
-                :src="item.imageUrl"
-                :alt="item.name"
+                :src="item.foto_produk"
+                :alt="item.nama_produk"
                 class="w-20 h-20 object-cover rounded-md"
               />
             </div>
 
-            <div class="w-4/6">
+            <div class="w-4/6" @click="goToDetail(item.id_produk)">
               <h2 class="text-lg font-semibold text-gray-800">
-                {{ item.name }}
+                {{ item.nama_produk }} - {{ item.berat_produk }} g
               </h2>
             </div>
 
             <div class="w-2/6 flex flex-col items-end">
               <!-- PRICE -->
               <p class="font-bold text-customGreen mb-2">
-                Rp {{ (item.price * item.quantity).toLocaleString() }}
+                Rp {{ (item.harga_produk_tersimpan * item.kuantitas_produk).toLocaleString() }}
               </p>
 
               <!-- ACTIONS -->
               <div class="flex items-center gap-3">
                 <!-- DELETE -->
                 <button
-                  @click="removeItem(item.id)"
+                  @click="removeItem(item.id_detail_pesanan)"
                   class="text-red-500 hover:text-red-700"
                 >
                   🗑️
@@ -118,7 +169,7 @@ definePageMeta({
                   </button>
 
                   <span class="min-w-[20px] text-center">
-                    {{ item.quantity }}
+                    {{ item.kuantitas_produk  }}
                   </span>
 
                   <button @click="increaseQty(item)" class="px-2 font-bold">
