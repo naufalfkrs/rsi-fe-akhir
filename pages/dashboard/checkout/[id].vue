@@ -56,8 +56,7 @@ onMounted(() => {
   productDetail.value = Products.value.find((n) => n.id === productId) || null;
 });
 
-const goCart = () => navigateTo("/dashboard/keranjang");
-const buyNow = () => navigateTo(`/dashboard/checkout/${productId}`);
+const buyNow = () => navigateTo(`/dashboard/transaksi/${productId}`);
 </script>
 
 <template>
@@ -118,7 +117,7 @@ const buyNow = () => navigateTo(`/dashboard/checkout/${productId}`);
                   </p>
 
                   <p class="text-gray-600 text-sm mt-1">
-                    Quantity: <span class="font-medium">{{ quantity }}</span>
+                    x <span class="font-medium">{{ quantity }}</span>
                   </p>
                 </div>
               </div>

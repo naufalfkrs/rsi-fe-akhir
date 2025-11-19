@@ -14,7 +14,7 @@ export const sidebarItems: NavMenuItems = [
     name: 'Transaksi',
     description: 'Daftar transaksi pembelianmu',
     icon: 'tabler:template',
-    route: '/dashboard/profile/transaksi',
+    route: '/dashboard/transaksi',
     // permission: ['letter.create'],
     type: 'header',
   },
