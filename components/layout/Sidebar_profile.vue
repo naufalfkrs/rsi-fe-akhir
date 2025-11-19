@@ -15,12 +15,12 @@ const props = defineProps<{
 }>();
 
 function handleLogout() {
-  // authStore.logout();
+  authStore.logout();
   router.push('/auth/login'); 
 }
 
 const authStore = useAuthStore();
-const { permissions } = storeToRefs(authStore);
+// const { permissions } = storeToRefs(authStore);
 
 function resolveNavItemComponent(item: NavLink | NavGroup | NavSectionTitle) {
   if ('heading' in item) return resolveComponent('LayoutNavHeading');
@@ -29,9 +29,9 @@ function resolveNavItemComponent(item: NavLink | NavGroup | NavSectionTitle) {
   return resolveComponent('LayoutNavLink');
 }
 
-const filteredMenuItems = computed(() => {
-  return sidebarItems.filter((item: any) => !('permission' in item) || item.permission.length === 0 || item.permission.every((perm: string) => permissions.value.includes(perm)));
-});
+// const filteredMenuItems = computed(() => {
+//   return sidebarItems.filter((item: any) => !('permission' in item) || item.permission.length === 0 || item.permission.every((perm: string) => permissions.value.includes(perm)));
+// });
 </script>
 
 <template>

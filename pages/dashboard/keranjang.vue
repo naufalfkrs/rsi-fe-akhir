@@ -55,6 +55,9 @@ const totalPrice = computed(() =>
     0
   )
 );
+definePageMeta({
+  middleware: 'auth'
+});
 </script>
 
 <template>

@@ -30,10 +30,6 @@ onMounted(() => {
   ];
 });
 
-definePageMeta({
-    layout: "dashboard",
-});
-
 const showPasswordModal = ref(false);
 
 function openPasswordModal() {
@@ -51,7 +47,9 @@ function togglePassword1() {
 function togglePassword2() {
   showPassword2.value = !showPassword2.value;
 }
-
+definePageMeta({
+  middleware: 'auth'
+});
 </script>
 
 <template>

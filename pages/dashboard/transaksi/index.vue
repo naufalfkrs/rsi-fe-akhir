@@ -208,6 +208,9 @@ const formatDeadlineDate = (dateString: string) => {
 };
 
 const goToDetail = (id: number) => navigateTo(`/dashboard/transaksi/${id}`);
+definePageMeta({
+  middleware: 'auth'
+});
 </script>
 
 <template>

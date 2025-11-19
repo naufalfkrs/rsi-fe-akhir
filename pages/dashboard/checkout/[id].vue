@@ -57,6 +57,9 @@ onMounted(() => {
 });
 
 const buyNow = () => navigateTo(`/dashboard/transaksi/${productId}`);
+definePageMeta({
+  middleware: 'auth'
+});
 </script>
 
 <template>

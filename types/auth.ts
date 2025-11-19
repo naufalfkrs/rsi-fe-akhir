@@ -1,11 +1,10 @@
 export interface User {
   id: number;
-  name: string;
+  nama: string;
   email: string;
-  phone_number: string;
-  roles: string | null;
-  updated_security?: string;
-  permissions?: string[];
+  nomor_telepon: string;
+  alamat: string;
+  role: string | null;
 }
 
 export interface AuthResponse {

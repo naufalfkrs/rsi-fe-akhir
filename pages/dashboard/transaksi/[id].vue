@@ -215,6 +215,9 @@ const totalHarga = computed(() => {
 });
 
 const back = () => navigateTo(`/dashboard/transaksi/`);
+definePageMeta({
+  middleware: 'auth'
+});
 </script>
 
 <template>

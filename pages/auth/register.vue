@@ -86,7 +86,9 @@ const router = useRouter();
 const name = ref<string>('');
 const email = ref<string>('');
 const password = ref<string>('');
+const confirm_password = ref<string>('');
 const phone_number = ref<string>('');
+const alamat = ref<string>('');
 const isLoading = ref<boolean>(false);
 const alertMessage = ref<string[]>([]);
 const alertType = ref<string>('');
@@ -101,11 +103,14 @@ const register = async () => {
   isLoading.value = true;
   resetAlert();
   try {
-    const response: any = await axios.post<RegisterResponse>(`${config.public.NUXT_PUBLIC_BASE_URL}/v1/auth/register`, {
-      name: name.value,
+    // const response: any = await axios.post<RegisterResponse>(`${config.public.NUXT_PUBLIC_BASE_URL}/register`, {
+    const response: any = await axios.post<RegisterResponse>(`http://127.0.0.1:8000/api/register`, {
+      nama: name.value,
       email: email.value,
       password: password.value,
-      phone_number: phone_number.value,
+      password_confirmation: confirm_password.value,
+      nomor_telepon: phone_number.value,
+      alamat: alamat.value,
     });
     alertMessage.value = [response.data.message];
     alertType.value = 'success';

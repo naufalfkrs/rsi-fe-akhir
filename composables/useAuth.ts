@@ -26,14 +26,14 @@ export const useAuthStore = defineStore('auth', {
       const baseUrl = config.public.NUXT_PUBLIC_BASE_URL as string;
 
       try {
-        const { data } = await useFetch<AuthResponse>(`${baseUrl}/v1/auth/me`, {
+        const { data } = await useFetch<AuthResponse>(`http://127.0.0.1:8000/api/user/me`, {
           headers: {
             Authorization: `Bearer ${this.token}`,
           },
         });
         const responseData = data.value as any;
         this.setUser(responseData.data.user);
-        this.setPermissions(responseData.data.user.permissions);
+        // this.setPermissions(responseData.data.user.permissions);
       } catch (error) {
         console.error('Error fetching permissions:', error);
       }
@@ -41,7 +41,6 @@ export const useAuthStore = defineStore('auth', {
     logout() {
       this.token = '';
       this.user = null;
-      this.permissions = [];
       useCookie('token').value = null;
     },
   },
