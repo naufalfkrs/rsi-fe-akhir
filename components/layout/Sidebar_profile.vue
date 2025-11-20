@@ -20,7 +20,7 @@ function handleLogout() {
 }
 
 const authStore = useAuthStore();
-// const { permissions } = storeToRefs(authStore);
+const { permissions } = storeToRefs(authStore);
 
 function resolveNavItemComponent(item: NavLink | NavGroup | NavSectionTitle) {
   if ('heading' in item) return resolveComponent('LayoutNavHeading');
@@ -29,9 +29,9 @@ function resolveNavItemComponent(item: NavLink | NavGroup | NavSectionTitle) {
   return resolveComponent('LayoutNavLink');
 }
 
-// const filteredMenuItems = computed(() => {
-//   return sidebarItems.filter((item: any) => !('permission' in item) || item.permission.length === 0 || item.permission.every((perm: string) => permissions.value.includes(perm)));
-// });
+const filteredMenuItems = computed(() => {
+  return sidebarItems.filter((item: any) => !('permission' in item) || item.permission.length === 0 || item.permission.every((perm: string) => permissions.value.includes(perm)));
+});
 </script>
 
 <template>
@@ -45,8 +45,8 @@ function resolveNavItemComponent(item: NavLink | NavGroup | NavSectionTitle) {
           <img src="/avatar.svg" alt="" class="rounded-full mt-2" />
         </Avatar>
         <span v-if="isOpen" class="hidden md:flex justify-start text-left flex-col items-start">
-          <span v-if="isOpen" class="hidden text-xl font-bold lg:inline-block">{{ authStore.user?.name || 'John Doe' }}</span>
-          <p class="m-0 text-[12px] leading-[1rem]">{{ authStore.user?.phone_number || '081111111111' }}</p>
+          <span v-if="isOpen" class="hidden text-xl font-bold lg:inline-block">{{ authStore.user?.nama || 'John Doe' }}</span>
+          <p class="m-0 text-[12px] leading-[1rem]">{{ authStore.user?.nomor_telepon || '081111111111' }}</p>
         </span>
       </div>
 

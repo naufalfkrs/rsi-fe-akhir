@@ -6,170 +6,195 @@ import { useNavbar } from "~/stores/navbar";
 
 interface ProductItem {
   id: number;
-  name: string;
-  imageUrl: string;
-  price: number;
-  description: string;
-  stock: number;
-  qty: number;
+  nama_produk: string;
+  foto_produk: string;
+  harga_produk: number;
+  berat_produk: number;
+  kuantitas_produk: number;
+  created_at: Date;
+  status_pesanan: string;
 }
 
 interface Product {
   id: number;
-  status: "menunggu" | "dikirim" | "dikemas" | "selesai" | "dibatalkan";
+  status: "menunggu pembayaran" | "dikirim" | "dikemas" | "selesai" | "dibatalkan";
   orderDate: string;
   deadlineDate?: string;
   products: ProductItem[];
 }
 
-const latestProducts = ref<Product[]>([]);
+const { $api } = useNuxtApp();
 const navbar = useNavbar();
+
+const productDetail = ref<Product | null>(null);
 
 const contentMargin = computed(() => (navbar.isOpen ? "ml-64" : "ml-20"));
 
 // simulasi pengambilan data
-onMounted(() => {
-  latestProducts.value = [
-    {
-      id: 1,
-      status: "menunggu",
-      orderDate: "2025-11-20T09:15:00",
-      deadlineDate: "2025-11-20T12:00:00",
-      products: [
-        {
-          id: 1,
-          name: "Sayur Sawi Hijau",
-          imageUrl: "/logo.png",
-          price: 12000,
-          description:
-            "Sawi hijau segar yang dipanen langsung dari kebun lokal. Cocok untuk tumisan dan sup.",
-          stock: 20,
-          qty: 2,
-        },
-        {
-          id: 2,
-          name: "Tomat Segar",
-          imageUrl: "/images/tomat.jpg",
-          price: 15000,
-          description: "Tomat merah segar yang cocok untuk masakan dan jus.",
-          stock: 20,
-          qty: 1,
-        },
-        {
-          id: 3,
-          name: "Tomat Segar",
-          imageUrl: "/images/tomat.jpg",
-          price: 15000,
-          description: "Tomat merah segar yang cocok untuk masakan dan jus.",
-          stock: 20,
-          qty: 1,
-        },
-      ],
-    },
-    {
-      id: 2,
-      status: "selesai",
-      orderDate: "2025-11-18T09:14:20",
-      products: [
-        {
-          id: 3,
-          name: "Wortel Organik",
-          imageUrl: "/images/wortel.jpg",
-          price: 18000,
-          description: "Wortel organik segar yang kaya vitamin A.",
-          stock: 20,
-          qty: 3,
-        },
-      ],
-    },
-    {
-      id: 3,
-      status: "dibatalkan",
-      orderDate: "2025-11-17T09:10:00",
-      products: [
-        {
-          id: 4,
-          name: "Sayur Sawi Hijau",
-          imageUrl: "/images/sawi.jpg",
-          price: 12000,
-          description:
-            "Sawi hijau segar dari kebun lokal, cocok untuk berbagai masakan.",
-          stock: 20,
-          qty: 1,
-        },
-        {
-          id: 5,
-          name: "Tomat Segar",
-          imageUrl: "/images/tomat.jpg",
-          price: 15000,
-          description: "Tomat merah segar yang cocok untuk masakan dan salad.",
-          stock: 20,
-          qty: 2,
-        },
-      ],
-    },
-    {
-      id: 4,
-      status: "dikirim",
-      orderDate: "2025-11-17T09:10:00",
-      products: [
-        {
-          id: 4,
-          name: "Sayur Sawi Hijau",
-          imageUrl: "/images/sawi.jpg",
-          price: 12000,
-          description:
-            "Sawi hijau segar dari kebun lokal, cocok untuk berbagai masakan.",
-          stock: 20,
-          qty: 1,
-        },
-        {
-          id: 5,
-          name: "Tomat Segar",
-          imageUrl: "/images/tomat.jpg",
-          price: 15000,
-          description: "Tomat merah segar yang cocok untuk masakan dan salad.",
-          stock: 20,
-          qty: 2,
-        },
-      ],
-    },
-    {
-      id: 5,
-      status: "dikemas",
-      orderDate: "2025-11-17T09:10:00",
-      products: [
-        {
-          id: 4,
-          name: "Sayur Sawi Hijau",
-          imageUrl: "/images/sawi.jpg",
-          price: 12000,
-          description:
-            "Sawi hijau segar dari kebun lokal, cocok untuk berbagai masakan.",
-          stock: 20,
-          qty: 1,
-        },
-        {
-          id: 5,
-          name: "Tomat Segar",
-          imageUrl: "/images/tomat.jpg",
-          price: 15000,
-          description: "Tomat merah segar yang cocok untuk masakan dan salad.",
-          stock: 20,
-          qty: 2,
-        },
-      ],
-    },
-  ];
+// onMounted(() => {
+//   latestProducts.value = [
+//     {
+//       id: 1,
+//       status: "menunggu",
+//       orderDate: "2025-11-20T09:15:00",
+//       deadlineDate: "2025-11-20T12:00:00",
+//       products: [
+//         {
+//           id: 1,
+//           name: "Sayur Sawi Hijau",
+//           imageUrl: "/logo.png",
+//           price: 12000,
+//           description:
+//             "Sawi hijau segar yang dipanen langsung dari kebun lokal. Cocok untuk tumisan dan sup.",
+//           stock: 20,
+//           qty: 2,
+//         },
+//         {
+//           id: 2,
+//           name: "Tomat Segar",
+//           imageUrl: "/images/tomat.jpg",
+//           price: 15000,
+//           description: "Tomat merah segar yang cocok untuk masakan dan jus.",
+//           stock: 20,
+//           qty: 1,
+//         },
+//         {
+//           id: 3,
+//           name: "Tomat Segar",
+//           imageUrl: "/images/tomat.jpg",
+//           price: 15000,
+//           description: "Tomat merah segar yang cocok untuk masakan dan jus.",
+//           stock: 20,
+//           qty: 1,
+//         },
+//       ],
+//     },
+//     {
+//       id: 2,
+//       status: "selesai",
+//       orderDate: "2025-11-18T09:14:20",
+//       products: [
+//         {
+//           id: 3,
+//           name: "Wortel Organik",
+//           imageUrl: "/images/wortel.jpg",
+//           price: 18000,
+//           description: "Wortel organik segar yang kaya vitamin A.",
+//           stock: 20,
+//           qty: 3,
+//         },
+//       ],
+//     },
+//     {
+//       id: 3,
+//       status: "dibatalkan",
+//       orderDate: "2025-11-17T09:10:00",
+//       products: [
+//         {
+//           id: 4,
+//           name: "Sayur Sawi Hijau",
+//           imageUrl: "/images/sawi.jpg",
+//           price: 12000,
+//           description:
+//             "Sawi hijau segar dari kebun lokal, cocok untuk berbagai masakan.",
+//           stock: 20,
+//           qty: 1,
+//         },
+//         {
+//           id: 5,
+//           name: "Tomat Segar",
+//           imageUrl: "/images/tomat.jpg",
+//           price: 15000,
+//           description: "Tomat merah segar yang cocok untuk masakan dan salad.",
+//           stock: 20,
+//           qty: 2,
+//         },
+//       ],
+//     },
+//     {
+//       id: 4,
+//       status: "dikirim",
+//       orderDate: "2025-11-17T09:10:00",
+//       products: [
+//         {
+//           id: 4,
+//           name: "Sayur Sawi Hijau",
+//           imageUrl: "/images/sawi.jpg",
+//           price: 12000,
+//           description:
+//             "Sawi hijau segar dari kebun lokal, cocok untuk berbagai masakan.",
+//           stock: 20,
+//           qty: 1,
+//         },
+//         {
+//           id: 5,
+//           name: "Tomat Segar",
+//           imageUrl: "/images/tomat.jpg",
+//           price: 15000,
+//           description: "Tomat merah segar yang cocok untuk masakan dan salad.",
+//           stock: 20,
+//           qty: 2,
+//         },
+//       ],
+//     },
+//     {
+//       id: 5,
+//       status: "dikemas",
+//       orderDate: "2025-11-17T09:10:00",
+//       products: [
+//         {
+//           id: 4,
+//           name: "Sayur Sawi Hijau",
+//           imageUrl: "/images/sawi.jpg",
+//           price: 12000,
+//           description:
+//             "Sawi hijau segar dari kebun lokal, cocok untuk berbagai masakan.",
+//           stock: 20,
+//           qty: 1,
+//         },
+//         {
+//           id: 5,
+//           name: "Tomat Segar",
+//           imageUrl: "/images/tomat.jpg",
+//           price: 15000,
+//           description: "Tomat merah segar yang cocok untuk masakan dan salad.",
+//           stock: 20,
+//           qty: 2,
+//         },
+//       ],
+//     },
+//   ];
+// });
+onMounted(async () => {
+  const res = await $api.get(`http://127.0.0.1:8000/api/user/pesanan/`);
+  const data = res.data;
+
+  productDetail.value = data.map((data: any) => ({
+    id: data.id_pesanan,
+    status: data.status_pesanan?.toLowerCase(), // "Menunggu Pembayaran" → "menunggu"
+    orderDate: data.created_at,
+    deadlineDate: data.pembayaran?.tanggal_pembayaran ?? null,
+
+    products: data.detail_pesanans.map((item: any) => ({
+      id: item.id_detail_pesanan,
+      nama_produk: item.produk.nama_produk,
+    //   foto_produk: "http://127.0.0.1:8000/storage/" + item.produk.foto_produk,
+      foto_produk: item.produk.foto_produk,
+      harga_produk: Number(item.harga_produk_tersimpan),
+      berat_produk: item.produk.berat_produk,
+      kuantitas_produk: item.kuantitas_produk,
+      created_at: item.created_at,
+    }))
+  }));
 });
 
 const totalPrice = (p: ProductItem[]) =>
-  p.reduce((sum, item) => sum + item.price * item.qty, 0 + 13000);
+  p.reduce((sum, item) => sum + item.harga_produk * item.kuantitas_produk, 0 + 13000);
 
 // UBAH LABEL STATUS
 const statusLabel = (status: Product["status"]) => {
   switch (status) {
-    case "menunggu":
+    case "menunggu pembayaran":
       return "Menunggu Pembayaran";
     case "dikirim":
       return "Dikirim";
@@ -221,7 +246,7 @@ definePageMeta({
       <main class="flex-1 max-w-[70%] mx-auto py-10">
         <h1 class="text-2xl font-bold mb-6">Transkasi Saya</h1>
         <div
-          v-for="item in latestProducts"
+          v-for="item in productDetail"
           :key="item.id"
           class="w-full bg-white shadow-md rounded-lg p-5 mb-4 overflow-hidden hover:shadow-lg transition cursor-pointer"
           @click="goToDetail(item.id)"
@@ -247,7 +272,7 @@ definePageMeta({
                 <p
                   class="inline-block text-xs px-3 py-1 rounded-md font-semibold"
                   :class="{
-                    'bg-yellow-100 text-yellow-700': item.status === 'menunggu',
+                    'bg-yellow-100 text-yellow-700': item.status === 'menunggu pembayaran',
                     'bg-purple-100 text-purple-700': item.status === 'dikirim',
                     'bg-blue-100 text-blue-700': item.status === 'dikemas',
                     'bg-green-100 text-green-700': item.status === 'selesai',
@@ -262,7 +287,7 @@ definePageMeta({
             <!-- RIGHT -->
             <div class="text-right flex flex-col justify-center items-end">
               <p
-                v-if="item.status === 'menunggu'"
+                v-if="item.status === 'menunggu pembayaran'"
                 class="text-red-600 text-xs font-medium mb-1"
               >
                 Bayar sebelum: {{ formatDeadlineDate(item.deadlineDate) }}
@@ -274,18 +299,18 @@ definePageMeta({
           <div class="flex justify-between items-center">
             <div class="mt-5 flex gap-4">
               <img
-                :src="item.products[0].imageUrl"
+                :src="item.products[0].foto_produk"
                 class="w-20 h-20 object-cover rounded-md shadow"
               />
 
               <div class="flex flex-col h-20">
                 <p class="font-semibold text-gray-800 text-sm">
-                  {{ item.products[0].name }}
+                  {{ item.products[0].nama_produk }}
                 </p>
 
                 <p class="text-gray-600 text-xs mt-1">
-                  {{ item.products[0].qty }} x Rp
-                  {{ item.products[0].price.toLocaleString() }}
+                  {{ item.products[0].kuantitas_produk }} x Rp
+                  {{ item.products[0].harga_produk.toLocaleString() }}
                 </p>
 
                 <!-- INI DIBUAT NEMPEL DI BAWAH -->
@@ -306,7 +331,7 @@ definePageMeta({
               </p>
             </div>
           </div>
-          <div v-if="item.status === 'menunggu'" class="mt-5 flex justify-end gap-3">
+          <div v-if="item.status === 'menunggu pembayaran'" class="mt-5 flex justify-end gap-3">
             <button
               class="border border-gray-600 bg-white text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm"
             >

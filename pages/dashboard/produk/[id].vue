@@ -42,34 +42,55 @@ onMounted(async () => {
 const goCart = async () => {
   try {
     const cart = await $api.get("http://127.0.0.1:8000/api/user/keranjang");
+    const details = cart.data.data?.detail_pesanans || [];
 
-    const exists = cart.data.data.detail_pesanans.find(
+    // CARI apakah produk sudah ada di keranjang
+    const exists = details.find(
       (i: any) => i.id_produk === productId
     );
 
     if (exists) {
-      // Kalau produk sudah ada → update qty
+      // UPDATE jika produk sudah ada
       await $api.put(
         `http://127.0.0.1:8000/api/user/keranjang/${exists.id_detail_pesanan}`,
         { kuantitas: exists.kuantitas_produk + quantity.value }
       );
-
-      return navigateTo("/dashboard/keranjang");
+    } else {
+      // INSERT BARU jika produk tidak ada / keranjang kosong
+      await $api.post("http://127.0.0.1:8000/api/user/keranjang", {
+        id_produk: productId,
+        kuantitas: quantity.value,
+        mode: "cart"
+      });
     }
 
-    await $api.post("http://127.0.0.1:8000/api/user/keranjang", {
-      id_produk: productId,
-      kuantitas: quantity.value,
-    });
+    // pergi ke keranjang setelah berhasil
+    navigateTo("/dashboard/keranjang");
 
-    // console.log("Berhasil tambah:", res.data);
-    navigateTo("/dashboard/keranjang"); // pindah ke keranjang
   } catch (error: any) {
     console.error(error);
     alert(error.response?.data?.message || "Gagal menambahkan ke keranjang");
   }
 };
-const buyNow = () => navigateTo(`/dashboard/checkout/${productId}`);
+
+const buyNow = async () => {
+  try {
+    const res = await $api.post("http://127.0.0.1:8000/api/user/keranjang", {
+      id_produk: productId,
+      kuantitas: quantity.value,
+      mode: "buy"
+    });
+
+    const id_pesanan = res.data.id_pesanan;
+
+    // pergi ke keranjang setelah berhasil
+    navigateTo(`/dashboard/checkout/${id_pesanan}`);
+
+  } catch (error: any) {
+    console.error(error);
+    alert(error.response?.data?.message || "Gagal menambahkan ke checkout");
+  }
+};
 </script>
 
 <template>

@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import Header from "~/components/layout/Header.vue";
 
 interface CartItem {
+  id_pesanan: number;
   id_detail_pesanan: number;
   nama_produk: string;
   foto_produk: string;
@@ -14,31 +15,6 @@ interface CartItem {
 const cartItems = ref<CartItem[]>([]);
 const { $api } = useNuxtApp();
 
-// onMounted(() => {
-//   cartItems.value = [
-//     {
-//       id: 1,
-//       name: "Sayur Sawi Hijau",
-//       imageUrl: "/logo.png",
-//       price: 12000,
-//       quantity: 1,
-//     },
-//     {
-//       id: 2,
-//       name: "Tomat Segar",
-//       imageUrl: "/images/tomat.jpg",
-//       price: 15000,
-//       quantity: 2,
-//     },
-//     {
-//       id: 3,
-//       name: "Wortel Organik",
-//       imageUrl: "/images/wortel.jpg",
-//       price: 18000,
-//       quantity: 1,
-//     },
-//   ];
-// });
 onMounted(async () => {
   try {
     const res = await $api.get("http://127.0.0.1:8000/api/user/keranjang");
@@ -52,6 +28,7 @@ onMounted(async () => {
     // data: { detail_pesanans: [...] }
     cartItems.value = res.data.data.detail_pesanans.map((item: any) => ({
       id_detail_pesanan: item.id_detail_pesanan,
+      id_pesanan: item.id_pesanan,
       id_produk: item.produk.id_produk,
       nama_produk: item.produk.nama_produk,
       foto_produk: item.produk.foto_produk,
@@ -103,6 +80,15 @@ const totalPrice = computed(() =>
     0
   )
 );
+
+// const checkout = (item: CartItem) => navigateTo(`/dashboard/transaksi/${item.id_pesanan}`);
+
+const checkout = () => {
+  if (cartItems.value.length === 0) return;
+
+  const idPesanan = cartItems.value[0].id_pesanan;
+  navigateTo(`/dashboard/checkout/${idPesanan}`);
+};
 
 const goToDetail = (id_detail: number) => navigateTo(`/dashboard/produk/${id_detail}`);
 
@@ -199,6 +185,7 @@ definePageMeta({
 
             <button
               class="w-full py-3 bg-customGreen text-white rounded-md hover:bg-customDarkGreen transition flex justify-center items-center gap-2"
+              @click="checkout"
             >
               🛒 Beli Sekarang
             </button>
