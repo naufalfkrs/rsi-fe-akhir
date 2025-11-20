@@ -15,7 +15,7 @@ const props = defineProps<{
 }>();
 
 function handleLogout() {
-  // authStore.logout();
+  authStore.logout();
   router.push('/auth/login'); 
 }
 
@@ -45,8 +45,8 @@ const filteredMenuItems = computed(() => {
           <img src="/avatar.svg" alt="" class="rounded-full mt-2" />
         </Avatar>
         <span v-if="isOpen" class="hidden md:flex justify-start text-left flex-col items-start">
-          <span v-if="isOpen" class="hidden text-xl font-bold lg:inline-block">{{ authStore.user?.name || 'John Doe' }}</span>
-          <p class="m-0 text-[12px] leading-[1rem]">{{ authStore.user?.phone_number || '081111111111' }}</p>
+          <span v-if="isOpen" class="hidden text-xl font-bold lg:inline-block">{{ authStore.user?.nama || 'John Doe' }}</span>
+          <p class="m-0 text-[12px] leading-[1rem]">{{ authStore.user?.nomor_telepon || '081111111111' }}</p>
         </span>
       </div>
 

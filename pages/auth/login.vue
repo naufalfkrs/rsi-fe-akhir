@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useToast } from 'vue-toastification';
 import Spinner from '~/components/Spinner.vue';
-// import { useAuthStore } from '~/composables/useAuth';
+import { useAuthStore } from '~/composables/useAuth';
 
 const router = useRouter();
 
@@ -12,31 +12,31 @@ const isLoading = ref<boolean>(false);
 const authStore = useAuthStore();
 const toast = useToast();
 
-// const { $api } = useNuxtApp();
+const { $api } = useNuxtApp();
 
 const login = async () => {
   isLoading.value = true;
   try {
-    // const response = await $api.post(`/v1/auth/login`, {
-    //   email: email.value,
-    //   password: password.value,
-    // });
-    // const token = response.data.data.access_token;
-    // authStore.setToken(token);
-    // await authStore.fetchUserPermissions();
-    await new Promise(resolve => setTimeout(resolve, 1000)) // delay 1 detik biar realistis
+    const response = await $api.post(`http://127.0.0.1:8000/api/login`, {
+      email: email.value,
+      password: password.value,
+    });
+    const token = response.data.access_token;
+    const user = response.data.user;
 
-    if (email.value === 'admin@mail.com' && password.value === 'rahasia123') {
-      toast.success('Login berhasil! Selamat datang kembali 👋')
-      router.push('/dashboard')
-    } else {
-      toast.error('Email atau password salah!')
-    }
-    // router.push('/dashboard/surat');
-  } catch (error) {
+    authStore.setToken(token);
+    authStore.setUser(user);
+    router.push('/dashboard');
+
+  } catch (error: any) {
     console.error('Login failed:', error);
-    // toast.error('Login failed. Please check your email and password.');
-    toast.error('Terjadi kesalahan saat login.');
+    if (error.response?.status === 401) {
+      toast.error("Email atau password salah!");
+    } else if (error.response?.status === 400) {
+      toast.error("Input tidak valid!");
+    } else {
+      toast.error("Terjadi kesalahan saat login.");
+    }
   } finally {
     isLoading.value = false;
   }

@@ -24,10 +24,6 @@ const color = useColorMode();
 
 const isMediumScreen = useMediaQuery('(min-width: 768px)');
 
-const filteredMenuItems = computed(() => {
-  return sidebarItems.filter((item: any) => !('permission' in item) || item.permission.length === 0 || item.permission.every((perm: string) => permissions.value.includes(perm)));
-});
-
 onMounted(() => {
   document.documentElement.classList.remove('dark')
 })
@@ -68,13 +64,13 @@ onMounted(() => {
             <Icon name="line-md:moon-alt-loop" size="24" v-else />
           </Button> -->
           <!-- <div class="border-x-[1px] border-gray-300 h-[24px] w-[1px] mx-2"></div> -->
-          <nuxt-link to="/dashboard/berita" class="text-white hover:text-gray-200" active-class="font-semibold">
+          <nuxt-link to="/dashboard/keranjang" class="text-white hover:text-gray-200" active-class="font-semibold">
             <ShoppingCart class="w-6 h-6" />
           </nuxt-link>
           <nuxt-link to="/dashboard/profile" class="border-0 bg-transparent hover:bg-transparent text-white shadow-none flex items-center max-w-[200px] w-full justify-start ml-6">
             <span class="hidden md:flex justify-end text-right flex-col items-end">
               <p class="m-0 text-[12px] leading-[1rem]">Halo,</p>
-              <p class="m-0 text-[16px] font-medium leading-[1rem]">{{ authStore.user?.name || 'John Doe' }}</p>
+              <p class="m-0 text-[16px] font-medium leading-[1rem]">{{ authStore.user?.nama || 'John Doe' }}</p>
             </span>
 
 

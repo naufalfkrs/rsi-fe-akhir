@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!user?.roles || user?.roles.length === 0" class="flex justify-center items-center">
+    <div v-if="!user?.role || user?.role.length === 0" class="flex justify-center items-center">
       <div class="flex flex-col">
         <img class="w-[400px]" src="/403.png" alt="" />
         <h1 class="text-3xl font-bold text-center">Anda belum memiliki akses</h1>
@@ -21,8 +21,8 @@
 <script setup lang="ts">
 const { user } = useAuthStore();
 
-definePageMeta({
-  layout: 'dashboard',
-  middleware: ['auth'],
-});
+// definePageMeta({
+//   layout: 'dashboard',
+//   middleware: ['auth'],
+// });
 </script>
