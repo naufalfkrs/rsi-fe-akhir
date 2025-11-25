@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img :src="qrCodeUrl" alt="QR Code" :options="{ width: 50, height: 50 }">
+    <img :src="qrCodeUrl" alt="QR Code" :width="size" :height="size" />
   </div>
 </template>
 
@@ -10,13 +10,20 @@ import QRCode from 'qrcode';
 
 const props = defineProps({
   securedUrl: String,
+  size: {
+    type: Number,
+    default: 200,
+  }
 });
 
 const qrCodeUrl = ref('');
 
 watchEffect(async () => {
   if (props.securedUrl) {
-    qrCodeUrl.value = await QRCode.toDataURL(props.securedUrl);
+    qrCodeUrl.value = await QRCode.toDataURL(props.securedUrl, {
+      width: props.size,   // ← ukuran QR
+      margin: 2
+    });
   }
 });
 </script>

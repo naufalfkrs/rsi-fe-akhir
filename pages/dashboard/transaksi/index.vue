@@ -17,7 +17,7 @@ interface ProductItem {
 
 interface Product {
   id: number;
-  status: "menunggu pembayaran" | "dikirim" | "dikemas" | "selesai" | "dibatalkan";
+  status: "menunggu" | "menunggu_konfirmasi" |"dikirim" | "dikemas" | "selesai" | "dibatalkan";
   orderDate: string;
   deadlineDate?: string;
   products: ProductItem[];
@@ -30,142 +30,7 @@ const productDetail = ref<Product | null>(null);
 
 const contentMargin = computed(() => (navbar.isOpen ? "ml-64" : "ml-20"));
 
-// simulasi pengambilan data
-// onMounted(() => {
-//   latestProducts.value = [
-//     {
-//       id: 1,
-//       status: "menunggu",
-//       orderDate: "2025-11-20T09:15:00",
-//       deadlineDate: "2025-11-20T12:00:00",
-//       products: [
-//         {
-//           id: 1,
-//           name: "Sayur Sawi Hijau",
-//           imageUrl: "/logo.png",
-//           price: 12000,
-//           description:
-//             "Sawi hijau segar yang dipanen langsung dari kebun lokal. Cocok untuk tumisan dan sup.",
-//           stock: 20,
-//           qty: 2,
-//         },
-//         {
-//           id: 2,
-//           name: "Tomat Segar",
-//           imageUrl: "/images/tomat.jpg",
-//           price: 15000,
-//           description: "Tomat merah segar yang cocok untuk masakan dan jus.",
-//           stock: 20,
-//           qty: 1,
-//         },
-//         {
-//           id: 3,
-//           name: "Tomat Segar",
-//           imageUrl: "/images/tomat.jpg",
-//           price: 15000,
-//           description: "Tomat merah segar yang cocok untuk masakan dan jus.",
-//           stock: 20,
-//           qty: 1,
-//         },
-//       ],
-//     },
-//     {
-//       id: 2,
-//       status: "selesai",
-//       orderDate: "2025-11-18T09:14:20",
-//       products: [
-//         {
-//           id: 3,
-//           name: "Wortel Organik",
-//           imageUrl: "/images/wortel.jpg",
-//           price: 18000,
-//           description: "Wortel organik segar yang kaya vitamin A.",
-//           stock: 20,
-//           qty: 3,
-//         },
-//       ],
-//     },
-//     {
-//       id: 3,
-//       status: "dibatalkan",
-//       orderDate: "2025-11-17T09:10:00",
-//       products: [
-//         {
-//           id: 4,
-//           name: "Sayur Sawi Hijau",
-//           imageUrl: "/images/sawi.jpg",
-//           price: 12000,
-//           description:
-//             "Sawi hijau segar dari kebun lokal, cocok untuk berbagai masakan.",
-//           stock: 20,
-//           qty: 1,
-//         },
-//         {
-//           id: 5,
-//           name: "Tomat Segar",
-//           imageUrl: "/images/tomat.jpg",
-//           price: 15000,
-//           description: "Tomat merah segar yang cocok untuk masakan dan salad.",
-//           stock: 20,
-//           qty: 2,
-//         },
-//       ],
-//     },
-//     {
-//       id: 4,
-//       status: "dikirim",
-//       orderDate: "2025-11-17T09:10:00",
-//       products: [
-//         {
-//           id: 4,
-//           name: "Sayur Sawi Hijau",
-//           imageUrl: "/images/sawi.jpg",
-//           price: 12000,
-//           description:
-//             "Sawi hijau segar dari kebun lokal, cocok untuk berbagai masakan.",
-//           stock: 20,
-//           qty: 1,
-//         },
-//         {
-//           id: 5,
-//           name: "Tomat Segar",
-//           imageUrl: "/images/tomat.jpg",
-//           price: 15000,
-//           description: "Tomat merah segar yang cocok untuk masakan dan salad.",
-//           stock: 20,
-//           qty: 2,
-//         },
-//       ],
-//     },
-//     {
-//       id: 5,
-//       status: "dikemas",
-//       orderDate: "2025-11-17T09:10:00",
-//       products: [
-//         {
-//           id: 4,
-//           name: "Sayur Sawi Hijau",
-//           imageUrl: "/images/sawi.jpg",
-//           price: 12000,
-//           description:
-//             "Sawi hijau segar dari kebun lokal, cocok untuk berbagai masakan.",
-//           stock: 20,
-//           qty: 1,
-//         },
-//         {
-//           id: 5,
-//           name: "Tomat Segar",
-//           imageUrl: "/images/tomat.jpg",
-//           price: 15000,
-//           description: "Tomat merah segar yang cocok untuk masakan dan salad.",
-//           stock: 20,
-//           qty: 2,
-//         },
-//       ],
-//     },
-//   ];
-// });
-onMounted(async () => {
+const fetchTransaksi = async () => {
   const res = await $api.get(`http://127.0.0.1:8000/api/user/pesanan/`);
   const data = res.data;
 
@@ -186,6 +51,9 @@ onMounted(async () => {
       created_at: item.created_at,
     }))
   }));
+};
+onMounted(async () => {
+  fetchTransaksi();
 });
 
 const totalPrice = (p: ProductItem[]) =>
@@ -194,8 +62,10 @@ const totalPrice = (p: ProductItem[]) =>
 // UBAH LABEL STATUS
 const statusLabel = (status: Product["status"]) => {
   switch (status) {
-    case "menunggu pembayaran":
+    case "menunggu":
       return "Menunggu Pembayaran";
+    case "menunggu_konfirmasi":
+      return "Menunggu Konfirmasi";
     case "dikirim":
       return "Dikirim";
     case "dikemas":
@@ -233,6 +103,35 @@ const formatDeadlineDate = (dateString: string) => {
 };
 
 const goToDetail = (id: number) => navigateTo(`/dashboard/transaksi/${id}`);
+
+const bayar = (id: number) => navigateTo(`/dashboard/pembayaran/${id}`);
+
+const isLoadingCancel = ref(false);
+const batalkanTransaksi = async (id: number) => {
+  if (!confirm("Yakin ingin membatalkan pesanan ini?")) return;
+
+  try {
+    isLoadingCancel.value = true;
+
+    const res = await $api.post(
+      `http://127.0.0.1:8000/api/user/pesanan/${id}/batalkan`
+    );
+
+    alert(res.data.message || "Pesanan berhasil dibatalkan!");
+
+    // Redirect kembali ke halaman list transaksi
+    await fetchTransaksi();
+  } catch (err: any) {
+    const msg =
+      err.response?.data?.message ||
+      "Gagal membatalkan pesanan, silakan coba lagi.";
+
+    alert(msg);
+  } finally {
+    isLoadingCancel.value = false;
+  }
+};
+
 definePageMeta({
   middleware: 'auth'
 });
@@ -249,7 +148,6 @@ definePageMeta({
           v-for="item in productDetail"
           :key="item.id"
           class="w-full bg-white shadow-md rounded-lg p-5 mb-4 overflow-hidden hover:shadow-lg transition cursor-pointer"
-          @click="goToDetail(item.id)"
         >
           <!-- TRANSACTION CARD -->
 
@@ -272,7 +170,8 @@ definePageMeta({
                 <p
                   class="inline-block text-xs px-3 py-1 rounded-md font-semibold"
                   :class="{
-                    'bg-yellow-100 text-yellow-700': item.status === 'menunggu pembayaran',
+                    'bg-yellow-100 text-yellow-700': item.status === 'menunggu',
+                    'bg-gray-100 text-gray-600': item.status === 'menunggu_konfirmasi',
                     'bg-purple-100 text-purple-700': item.status === 'dikirim',
                     'bg-blue-100 text-blue-700': item.status === 'dikemas',
                     'bg-green-100 text-green-700': item.status === 'selesai',
@@ -287,7 +186,7 @@ definePageMeta({
             <!-- RIGHT -->
             <div class="text-right flex flex-col justify-center items-end">
               <p
-                v-if="item.status === 'menunggu pembayaran'"
+                v-if="item.status === 'menunggu'"
                 class="text-red-600 text-xs font-medium mb-1"
               >
                 Bayar sebelum: {{ formatDeadlineDate(item.deadlineDate) }}
@@ -296,7 +195,7 @@ definePageMeta({
           </div>
 
           <!-- PRODUCT LIST -->
-          <div class="flex justify-between items-center">
+          <div class="flex justify-between items-center" @click="goToDetail(item.id)">
             <div class="mt-5 flex gap-4">
               <img
                 :src="item.products[0].foto_produk"
@@ -331,14 +230,17 @@ definePageMeta({
               </p>
             </div>
           </div>
-          <div v-if="item.status === 'menunggu pembayaran'" class="mt-5 flex justify-end gap-3">
+          <div v-if="item.status === 'menunggu'" class="mt-5 flex justify-end gap-3">
             <button
-              class="border border-gray-600 bg-white text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm"
+              @click="batalkanTransaksi(item.id)"
+              :disabled="isLoadingCancel"
+              class="mr-2 border border-gray-600 bg-white text-gray-600 px-5 py-2 rounded-lg hover:bg-red-600 disabled:opacity-50 transition"
             >
-              Batalkan Transaksi
+              {{ isLoadingCancel ? "Memproses..." : "Batalkan Transaksi" }}
             </button>
             <button
-              class="bg-customGreen text-white px-4 py-2 rounded-lg hover:bg-customDarkGreen transition text-sm"
+              class="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition"
+              @click="bayar(item.id)"
             >
               Bayar Sekarang
             </button>
