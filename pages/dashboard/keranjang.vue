@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import Header from "~/components/layout/Header.vue";
+import { useCartSession } from "~/composables/useCartSession";
+const { cart } = useCartSession();
+
+// const cartItems = ref([]);
 
 interface CartItem {
   id_pesanan: number;
-  id_detail_pesanan: number;
+  id_detail_pesanan: string;
   nama_produk: string;
   foto_produk: string;
   harga_produk_tersimpan: number;
@@ -13,66 +17,78 @@ interface CartItem {
 }
 
 const cartItems = ref<CartItem[]>([]);
-const { $api } = useNuxtApp();
+// const { $api } = useNuxtApp();
 
-onMounted(async () => {
-  try {
-    const res = await $api.get("http://127.0.0.1:8000/api/user/keranjang");
+// onMounted(async () => {
+//   try {
+//     const res = await $api.get("http://127.0.0.1:8000/api/user/keranjang");
 
-    if (!res.data.data) {
-      cartItems.value = [];
-      return;
-    }
+//     if (!res.data.data) {
+//       cartItems.value = [];
+//       return;
+//     }
 
-    // backend mengembalikan:
-    // data: { detail_pesanans: [...] }
-    cartItems.value = res.data.data.detail_pesanans.map((item: any) => ({
-      id_detail_pesanan: item.id_detail_pesanan,
-      id_pesanan: item.id_pesanan,
-      id_produk: item.produk.id_produk,
-      nama_produk: item.produk.nama_produk,
-      foto_produk: item.produk.foto_produk,
-      harga_produk_tersimpan: Number(item.harga_produk_tersimpan),
-      berat_produk: Number(item.produk.berat_produk),
-      kuantitas_produk: item.kuantitas_produk,
-    }));
+//     // backend mengembalikan:
+//     // data: { detail_pesanans: [...] }
+//     cartItems.value = res.data.data.detail_pesanans.map((item: any) => ({
+//       id_detail_pesanan: item.id_detail_pesanan,
+//       id_pesanan: item.id_pesanan,
+//       id_produk: item.produk.id_produk,
+//       nama_produk: item.produk.nama_produk,
+//       foto_produk: item.produk.foto_produk,
+//       harga_produk_tersimpan: Number(item.harga_produk_tersimpan),
+//       berat_produk: Number(item.produk.berat_produk),
+//       kuantitas_produk: item.kuantitas_produk,
+//     }));
 
-  } catch (error) {
-    console.error("Gagal memuat keranjang:", error);
-  }
-});
+//   } catch (error) {
+//     console.error("Gagal memuat keranjang:", error);
+//   }
+// });
 
-const updateQty = async (item: CartItem) => {
-  try {
-    await $api.put(
-      `http://127.0.0.1:8000/api/user/keranjang/${item.id_detail_pesanan}`,
-      { kuantitas: item.kuantitas_produk }
-    );
-  } catch (err) {
-    console.error("Gagal update jumlah:", err);
-  }
-};
+
+
+// const updateQty = async (item: CartItem) => {
+//   try {
+//     await $api.put(
+//       `http://127.0.0.1:8000/api/user/keranjang/${item.id_detail_pesanan}`,
+//       { kuantitas: item.kuantitas_produk }
+//     );
+//   } catch (err) {
+//     console.error("Gagal update jumlah:", err);
+//   }
+// };
+
+onMounted(() => {
+  cartItems.value = JSON.parse(JSON.stringify(cart.value.items))
+})
 
 const increaseQty = (item: any) => {
-  item.kuantitas_produk++;
-  updateQty(item);
-};
+  item.kuantitas_produk++
+  localStorage.setItem("cartSession", JSON.stringify({
+  id_pesanan: cart.value.id_pesanan,
+  items: cartItems.value
+}));
+}
 
 const decreaseQty = (item: any) => {
   if (item.kuantitas_produk > 1) {
-    item.kuantitas_produk--;
-    updateQty(item);
+    item.kuantitas_produk--
+    localStorage.setItem("cartSession", JSON.stringify({
+    id_pesanan: cart.value.id_pesanan,
+    items: cartItems.value
+  }));
   }
-};
+}
 
-const removeItem = async (id_detail: number) => {
-  try {
-    await $api.delete(`http://127.0.0.1:8000/api/user/keranjang/${id_detail}`);
-    cartItems.value = cartItems.value.filter((i) => i.id_detail_pesanan !== id_detail);
-  } catch (error) {
-    console.error("Gagal hapus item:", error);
-  }
-};
+const removeItem = (id_detail: string) => {
+  cartItems.value = cartItems.value.filter(i => i.id_detail_pesanan !== id_detail)
+  localStorage.setItem("cartSession", JSON.stringify({
+    id_pesanan: cart.value.id_pesanan,
+    items: cartItems.value
+  }));
+}
+
 
 const totalPrice = computed(() =>
   cartItems.value.reduce(
@@ -83,11 +99,18 @@ const totalPrice = computed(() =>
 
 // const checkout = (item: CartItem) => navigateTo(`/dashboard/transaksi/${item.id_pesanan}`);
 
+// const checkout = () => {
+//   if (cartItems.value.length === 0) return;
+
+//   const idPesanan = cartItems.value[0].id_pesanan;
+//   navigateTo(`/dashboard/checkout/${idPesanan}`);
+// };
+
+// SEBELUMNYA
 const checkout = () => {
   if (cartItems.value.length === 0) return;
 
-  const idPesanan = cartItems.value[0].id_pesanan;
-  navigateTo(`/dashboard/checkout/${idPesanan}`);
+  navigateTo(`/dashboard/checkout/${cart.value.id_pesanan}`);
 };
 
 const goToDetail = (id_detail: number) => navigateTo(`/dashboard/produk/${id_detail}`);
