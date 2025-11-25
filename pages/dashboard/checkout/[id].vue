@@ -4,7 +4,7 @@ import Header from "~/components/layout/Header.vue";
 import { useRoute } from "vue-router";
 import { useCartSession } from "~/composables/useCartSession";
 import { onBeforeRouteLeave } from "vue-router";
-const { cart, buyNowState, clearCart, clearBuyNow } = useCartSession();
+const { cart, buyNowState, skipLeaveConfirm, enableSkipLeave, clearCart, clearBuyNow } = useCartSession();
 
 const isBuyNow = computed(() => buyNowState.value.items.length > 0);
 const isCart = computed(() => cart.value.items.length > 0);
@@ -29,6 +29,9 @@ const { $api } = useNuxtApp();
 const productDetail = ref<Product[]>([]);
 
 onBeforeRouteLeave((to, from) => {
+  if (skipLeaveConfirm.value) {
+    return true;
+  }
   // Jika tidak ada session sama sekali → biarkan keluar
   if (!isBuyNow.value && !isCart.value) return true;
 
@@ -123,14 +126,19 @@ const totalPrice = computed(() =>
 
 const checkout = async () => {
   try {
+    enableSkipLeave();
     const res = await $api.post("http://127.0.0.1:8000/api/user/pesanan/checkout", {
       // alamat_pengiriman: '{{ authStore.user?.nama }}',
-      metode_pembayaran: "QRIS",
+      items: productDetail.value
     });
 
-    const idPesanan = res.data.data.id_pesanan;
-
-    navigateTo(`/dashboard/transaksi/${idPesanan}`);
+    if (isBuyNow.value) {
+      clearBuyNow();   // hanya hapus BuyNow
+    } else if (isCart.value) {
+      clearCart();     // hanya hapus Cart
+    }
+    
+    navigateTo(`/dashboard/transaksi/${res.data.id_pesanan}`);
   } catch (err: any) {
     console.error("Checkout gagal:", err);
   }

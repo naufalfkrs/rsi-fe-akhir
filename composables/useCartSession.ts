@@ -106,6 +106,12 @@ export const useCartSession = () => {
     saveBuyNow()
   }
 
+  const skipLeaveConfirm = ref(false);
+
+  function enableSkipLeave() {
+    skipLeaveConfirm.value = true;
+  }
+
   return {
     cart,
     buyNowState,
@@ -113,6 +119,8 @@ export const useCartSession = () => {
     setBuyNow,
     clearCart,
     clearBuyNow,
+    skipLeaveConfirm,
+    enableSkipLeave,
   };
 //   const cartSession = useState("cartSession_${user.id_pengguna}", () => ({
 //     mode: null,              // 'cart' atau 'buy-now'

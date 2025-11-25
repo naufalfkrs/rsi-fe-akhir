@@ -42,40 +42,6 @@ onMounted(async () => {
   }
 });
 
-// const goCart = async () => {
-//   try {
-//     const cart = await $api.get("http://127.0.0.1:8000/api/user/keranjang");
-//     const details = cart.data.data?.detail_pesanans || [];
-
-//     // CARI apakah produk sudah ada di keranjang
-//     const exists = details.find(
-//       (i: any) => i.id_produk === productId
-//     );
-
-//     if (exists) {
-//       // UPDATE jika produk sudah ada
-//       await $api.put(
-//         `http://127.0.0.1:8000/api/user/keranjang/${exists.id_detail_pesanan}`,
-//         { kuantitas: exists.kuantitas_produk + quantity.value }
-//       );
-//     } else {
-//       // INSERT BARU jika produk tidak ada / keranjang kosong
-//       await $api.post("http://127.0.0.1:8000/api/user/keranjang", {
-//         id_produk: productId,
-//         kuantitas: quantity.value,
-//         mode: "cart"
-//       });
-//     }
-
-//     // pergi ke keranjang setelah berhasil
-//     navigateTo("/dashboard/keranjang");
-
-//   } catch (error: any) {
-//     console.error(error);
-//     alert(error.response?.data?.message || "Gagal menambahkan ke keranjang");
-//   }
-// };
-
 const goCart = async () => {
   try {
     if (!productDetail.value) {
@@ -105,47 +71,12 @@ const goCart = async () => {
   }
 };
 
-// const buyNow = async () => {
-//   try {
-//     const res = await $api.post("http://127.0.0.1:8000/api/user/keranjang", {
-//       id_produk: productId,
-//       kuantitas: quantity.value,
-//       mode: "buy"
-//     });
-
-//     const id_pesanan = res.data.id_pesanan;
-
-//     // pergi ke keranjang setelah berhasil
-//     navigateTo(`/dashboard/checkout/${id_pesanan}`);
-
-//   } catch (error: any) {
-//     console.error(error);
-//     alert(error.response?.data?.message || "Gagal menambahkan ke checkout");
-//   }
-// };
 const buyNow = async () => {
   try {
     if (!productDetail.value) {
       console.error("Product detail belum dimuat");
       return;
     }
-    
-    // const id_pesanan = crypto.randomUUID();
-
-    // setCart({
-    //   mode: "buy",
-    //   items: [
-    //     {
-    //       id_pesanan: id_pesanan,
-    //       id_produk: productId,
-    //       nama_produk: productDetail.value.nama_produk,
-    //       foto_produk: productDetail.value.foto_produk,
-    //       harga_produk_tersimpan: productDetail.value.harga_produk,
-    //       berat_produk: productDetail.value.berat_produk,
-    //       kuantitas_produk: quantity.value
-    //     }
-    //   ]
-    // });
 
     const id_pesanan = setBuyNow(productDetail.value, quantity.value);
     navigateTo(`/dashboard/checkout/${id_pesanan}`);
