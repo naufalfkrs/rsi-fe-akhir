@@ -93,7 +93,7 @@ definePageMeta({
           >
             <div class="">
               <img
-                :src="item.foto_produk"
+                :src="`http://127.0.0.1:8000/storage/` + item.foto_produk"
                 :alt="item.nama_produk"
                 class="w-20 h-20 object-cover rounded-md"
               />

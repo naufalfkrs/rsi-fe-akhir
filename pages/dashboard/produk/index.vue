@@ -30,7 +30,7 @@ onMounted(async () => {
     latestProducts.value = res.data.map((p: any) => ({
       id: p.id_produk,
       name: p.nama_produk,
-      imageUrl: "/uploads/" + p.foto_produk, // sesuaikan folder upload kamu
+      imageUrl: "http://127.0.0.1:8000/storage/" + p.foto_produk, // sesuaikan folder upload kamu
       price: p.harga_produk,
       category: p.kategori_produk,
     }));

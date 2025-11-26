@@ -198,7 +198,7 @@ definePageMeta({
           <div class="flex justify-between items-center" @click="goToDetail(item.id)">
             <div class="mt-5 flex gap-4">
               <img
-                :src="item.products[0].foto_produk"
+                :src="'http://127.0.0.1:8000/storage/'+item.products[0].foto_produk"
                 class="w-20 h-20 object-cover rounded-md shadow"
               />
 

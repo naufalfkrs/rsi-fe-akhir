@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from "vue";
 import Header from "~/components/layout/Header.vue";
 import { useRoute } from "vue-router";
+import axios from "axios";
 
 interface News {
   id: number;
@@ -17,47 +18,55 @@ const newsId = Number(route.params.id);
 
 const newsList = ref<News[]>([]);
 const newsDetail = ref<News | null>(null);
+const isLoading = ref(true);
+
+// Ambil detail berita dari API
+async function fetchNewsDetail(id: number) {
+  try {
+    const response = await axios.get(`http://127.0.0.1:8000/api/berita/${id}`);
+    const b = response.data;
+    newsDetail.value = {
+      id: b.id_berita,
+      title: b.judul_berita,
+      author: b.penulis || "Admin",
+      content: b.isi_berita,
+      date: b.tanggal_publikasi,
+      imageUrl: b.gambar_berita
+        ? `http://127.0.0.1:8000/storage/${b.gambar_berita}`
+        : "/images/default-news.jpg"
+    };
+  } catch (error) {
+    console.error("Gagal mengambil detail berita:", error);
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+// Ambil daftar berita lainnya
+async function fetchOtherNews() {
+  try {
+    const response = await axios.get("http://127.0.0.1:8000/api/berita");
+    newsList.value = response.data
+      .filter((b: any) => b.id_berita !== newsId)
+      .map((b: any) => ({
+        id: b.id_berita,
+        title: b.judul_berita,
+        author: b.penulis || "Admin",
+        content: b.isi_berita,
+        date: b.tanggal_publikasi,
+        imageUrl: b.gambar_berita
+          ? `http://127.0.0.1:8000/storage/${b.gambar_berita}`
+          : "/images/default-news.jpg"
+      }));
+  } catch (error) {
+    console.error("Gagal mengambil daftar berita lainnya:", error);
+  }
+}
 
 onMounted(() => {
-  // dummy data
-  newsList.value = [
-    {
-      id: 1,
-      title: "Harga Cabai Turun Menjelang Akhir Bulan Karena Cuaca Membaik",
-      imageUrl: "/images/news-cabai.jpg",
-      date: "2025-10-30T11:30:00",
-      author: "Admin",
-      content:
-        "Cuaca membaik di berbagai wilayah menyebabkan pasokan cabai meningkat kembali..."
-    },
-    {
-      id: 2,
-      title: "Petani Lokal Hadirkan Komoditas Unggulan Baru Dengan Teknologi Modern",
-      imageUrl: "/images/news-petani.jpg",
-      date: "2025-10-28T09:15:00",
-      author: "Admin",
-      content:
-        "Penggunaan teknologi modern membuat para petani mampu menghadirkan produk unggulan baru..."
-    },
-    {
-      id: 3,
-      title: "Pemerintah Beri Subsidi Pupuk Untuk Mendukung Produktivitas Petani",
-      imageUrl: "/images/news-pupuk.jpg",
-      date: "2025-10-27T14:05:00",
-      author: "Admin",
-      content:
-        "Pemerintah memberikan subsidi pupuk untuk mendukung peningkatan produktivitas petani nasional..."
-    },
-  ];
-
-  // Ambil detail berita berdasarkan ID
-  newsDetail.value = newsList.value.find((n) => n.id === newsId) || null;
+  fetchNewsDetail(newsId);
+  fetchOtherNews();
 });
-
-// ⭐ FILTER: Semua berita kecuali ID yang sedang dibuka
-const otherNews = computed(() =>
-  newsList.value.filter((n) => n.id !== newsId)
-);
 
 // Format tanggal
 const formatDateTime = (dateString: string) => {
@@ -116,7 +125,7 @@ const goToDetail = (id: number) => {
         <h2 class="text-xl font-bold mb-2 text-gray-800">Berita Lainnya</h2>
 
         <div
-          v-for="n in otherNews"
+          v-for="n in newsList"
           :key="n.id"
           @click="goToDetail(n.id)"
           class="flex bg-white rounded-lg shadow-md p-3 gap-3 cursor-pointer hover:shadow-lg transition"

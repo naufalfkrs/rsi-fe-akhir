@@ -12,6 +12,7 @@ interface Berita {
   tanggal_publikasi: string;
 }
 
+const authStore = useAuthStore();
 const navbar = useNavbar();
 const beritaList = ref<Berita[]>([]);
 const isLoading = ref(true);
@@ -48,6 +49,32 @@ function formatDate(dateStr: string) {
   const year = d.getFullYear();
   return `${day}/${month}/${year}`;
 }
+
+const add = () => navigateTo(`/admin/berita/tambah`);
+
+const editProduct = (id: number) => {
+  navigateTo(`/admin/berita/ubah/${id}`);
+};
+
+const deleteProduct = async (productId: number) => {
+  const confirmDelete = confirm("Apakah Anda yakin ingin menghapus berita ini?");
+  if (!confirmDelete) return;
+
+  try {
+    await axios.delete(`http://127.0.0.1:8000/api/admin/berita/${productId}`, {
+      headers: {
+        Authorization: `Bearer ${authStore.token}`
+      }
+    });
+    // Hapus produk dari list secara lokal
+    beritaList.value = beritaList.value.filter(p => p.id_berita !== productId);
+    alert("Berita berhasil dihapus!");
+  } catch (error) {
+    console.error("Gagal menghapus berita:", error);
+    alert("Gagal menghapus berita!");
+  }
+};
+
 definePageMeta({
   middleware: 'auth'
 });
@@ -63,6 +90,7 @@ definePageMeta({
           <h1 class="text-3xl font-bold">Daftar Berita</h1>
           <button
             class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+            @click="add"
           >
             Tambah Produk
           </button>
@@ -90,10 +118,12 @@ definePageMeta({
                 <td class="px-6 py-4">{{ berita.penulis }}</td>
                 <td class="px-6 py-4">{{ formatDate(berita.tanggal_publikasi) }}</td>
                 <td class="px-6 py-4 flex gap-2">
-                  <button class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition">
+                  <button class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition"
+                  @click="editProduct(berita.id_berita)">
                     <i class="fas fa-edit"></i>Edit
                   </button>
-                  <button class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition">
+                  <button class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition"
+                  @click="deleteProduct(berita.id_berita)">
                     <i class="fas fa-trash"></i>Delete
                   </button>
                 </td>

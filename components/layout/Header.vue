@@ -75,7 +75,11 @@ onMounted(() => {
 
 
             <Avatar class="ml-2 h-8 w-8 bg-gray-100">
-              <img src="/avatar.svg" alt="" class="rounded-full mt-2" />
+              <img 
+                :src="authStore.user?.foto_profil ? 'http://127.0.0.1:8000/storage/' + authStore.user.foto_profil : '/avatar.svg'" 
+                alt="avatar" 
+                class="rounded-full" 
+              />
             </Avatar>
           </nuxt-link>
         </div>

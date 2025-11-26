@@ -137,7 +137,7 @@ const checkout = async () => {
     } else if (isCart.value) {
       clearCart();     // hanya hapus Cart
     }
-    
+
     navigateTo(`/dashboard/transaksi/${res.data.id_pesanan}`);
   } catch (err: any) {
     console.error("Checkout gagal:", err);
@@ -206,7 +206,7 @@ definePageMeta({
             <!-- KIRI: FOTO + NAMA + QTY -->
             <div class="flex items-center gap-3">
               <img
-                :src="item.foto_produk"
+                :src="'http://127.0.0.1:8000/storage/'+item.foto_produk"
                 class="w-20 h-20 object-cover rounded-md shadow-md"
                 alt="product"
               />

@@ -96,7 +96,7 @@ const buyNow = async () => {
       <!-- LEFT: IMAGE -->
       <div class="w-2/6">
         <img
-          :src="'/uploads/' + productDetail?.foto_produk"
+          :src="'http://127.0.0.1:8000/storage/' + productDetail?.foto_produk"
           class="rounded-lg shadow-md object-cover w-full"
           alt="product"
         />

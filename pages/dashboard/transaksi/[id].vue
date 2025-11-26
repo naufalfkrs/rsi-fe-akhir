@@ -75,14 +75,26 @@ const statusLabel = (status: Product["status"]) => {
   }
 };
 
-const formatOrderDate = (dateStr: string) => {
+const formatOrderDate = (dateStr: string | undefined) => {
+  if (!dateStr) return "-";
+
   const date = new Date(dateStr);
-  return date.toLocaleDateString("id-ID", {
+
+  const tgl = date.toLocaleDateString("id-ID", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
+
+  const jam = date.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  });
+
+  return `${tgl}, ${jam} WIB`;
 };
+
 
 const formatDeadline = (dateStr: string | undefined) => {
   if (!dateStr) return "-";
@@ -108,6 +120,7 @@ const totalHarga = computed(() => {
 
 const back = () => navigateTo(`/dashboard/transaksi/`);
 const bayar = () => navigateTo(`/dashboard/pembayaran/${productId}`);
+const aduan = () => navigateTo(`/dashboard/aduan/${productId}`);
 
 const isLoadingCancel = ref(false);
 const batalkanTransaksi = async () => {
@@ -181,7 +194,7 @@ definePageMeta({
             <div class="flex">
               <p class="w-40 font-semibold text-gray-700 text-sm">Waktu</p>
               <p class="text-gray-600 text-sm">
-                : 20 September 2025, 09:15 WIB
+                : {{ formatOrderDate(productDetail?.orderDate) }} 
               </p>
             </div>
           </div>
@@ -209,6 +222,7 @@ definePageMeta({
           >
             <button
               class="border border-gray-600 bg-white text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm"
+              @click="aduan"
             >
               Beri Pengaduan
             </button>
@@ -250,7 +264,7 @@ definePageMeta({
           >
             <!-- IMAGE -->
             <img
-              :src="item.foto_produk"
+              :src="'http://127.0.0.1:8000/storage/'+item.foto_produk"
               class="w-20 h-20 object-cover rounded-md shadow-md"
               alt="product"
             />

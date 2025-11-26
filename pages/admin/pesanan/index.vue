@@ -98,6 +98,28 @@ const filteredPesanan = computed(() => {
 
   return list;
 });
+
+async function updateStatusPesanan(pesananId: number, newStatus: string) {
+  try {
+    await axios.put(
+      `http://127.0.0.1:8000/api/admin/pesanan/${pesananId}/status`,
+      { status_pesanan: newStatus },
+      {
+        headers: {
+          Authorization: `Bearer ${authStore.token}`,
+        },
+      }
+    );
+    // Update lokal list agar UI langsung update
+    const index = pesananList.value.findIndex(p => p.id_pesanan === pesananId);
+    if (index !== -1) {
+      pesananList.value[index].status_pesanan = newStatus;
+    }
+    console.log(`Status pesanan ${pesananId} diubah menjadi ${newStatus}`);
+  } catch (error) {
+    console.error("Gagal update status pesanan:", error);
+  }
+}
 definePageMeta({
   middleware: 'auth'
 });
@@ -160,7 +182,7 @@ definePageMeta({
                 <td class="px-6 py-4">{{ pesanan.pembeli.nama }}</td>
                 <td class="px-6 py-4">
                   <div v-for="item in pesanan.detail_pesanans" :key="item.id_detail_pesanan" class="flex items-center gap-2 mb-1">
-                    <img :src="`/images/${item.produk.foto_produk}`" alt="" class="w-10 h-10 object-cover rounded" />
+                    <img :src="`http://127.0.0.1:8000/storage/${item.produk.foto_produk}`" alt="" class="w-10 h-10 object-cover rounded" />
                     <div>
                       <div>{{ item.produk.nama_produk }}</div>
                       <div class="text-sm text-gray-500">Qty: {{ item.kuantitas_produk }}</div>
@@ -177,14 +199,23 @@ definePageMeta({
                   <button
                     v-if="pesanan.status_pesanan === 'menunggu_konfirmasi'"
                     class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
+                    @click="updateStatusPesanan(pesanan.id_pesanan, 'dikemas')"
                   >
                     Konfirmasi
                   </button>
                   <button
                     v-if="pesanan.status_pesanan === 'dikemas'"
-                    class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
+                    class="bg-green-600 text-whitepx-3 py-1 rounded hover:bg-green-700 transition"
+                    @click="updateStatusPesanan(pesanan.id_pesanan, 'dikirim')"
                   >
                     Kirim Pesanan
+                  </button>
+                  <button
+                    v-if="pesanan.status_pesanan === 'dikirim'"
+                    class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
+                    @click="updateStatusPesanan(pesanan.id_pesanan, 'selesai')"
+                  >
+                    Selesaikan
                   </button>
                 </td>
               </tr>
