@@ -26,7 +26,14 @@ const login = async () => {
 
     authStore.setToken(token);
     authStore.setUser(user);
-    router.push('/dashboard');
+
+    if (user.role === 'admin') {
+      router.push('/admin/');
+    } else if (user.role === 'pembeli') {
+      router.push('/dashboard');
+    } else {
+      router.push('/'); // fallback jika role tidak sesuai
+    }
 
   } catch (error: any) {
     console.error('Login failed:', error);

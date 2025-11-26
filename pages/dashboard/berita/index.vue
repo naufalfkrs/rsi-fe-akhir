@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import Header from "~/components/layout/Header.vue";
+import axios from "axios";
 
 interface News {
   id: number;
@@ -10,6 +11,7 @@ interface News {
 }
 
 const newsList = ref<News[]>([]);
+const isLoading = ref(true);
 
 // PAGINATION
 const currentPage = ref(1);
@@ -64,68 +66,27 @@ const getPages = computed(() => {
   return pages;
 });
 
-onMounted(() => {
-  newsList.value = [
-    {
-      id: 1,
-      title: "Harga Cabai Turun Menjelang Akhir Bulan Karena Cuaca Membaik",
-      imageUrl: "/images/news-cabai.jpg",
-      date: "2025-10-30T11:30:00",
-    },
-    {
-      id: 2,
-      title:
-        "Petani Lokal Hadirkan Komoditas Unggulan Baru Dengan Teknologi Modern",
-      imageUrl: "/images/news-petani.jpg",
-      date: "2025-10-28T09:15:00",
-    },
-    {
-      id: 3,
-      title:
-        "Pemerintah Beri Subsidi Pupuk Untuk Mendukung Produktivitas Petani",
-      imageUrl: "/images/news-pupuk.jpg",
-      date: "2025-10-27T14:05:00",
-    },
-    {
-      id: 4,
-      title: "Produksi Sayuran Meningkat Tajam Di Awal Musim Hujan Tahun Ini",
-      imageUrl: "/images/news-sayur.jpg",
-      date: "2025-10-25T07:45:00",
-    },
-    {
-      id: 5,
-      title: "Harga Cabai Turun Menjelang Akhir Bulan Karena Cuaca Membaik",
-      imageUrl: "/images/news-cabai.jpg",
-      date: "2025-10-30T11:30:00",
-    },
-    {
-      id: 6,
-      title:
-        "Petani Lokal Hadirkan Komoditas Unggulan Baru Dengan Teknologi Modern",
-      imageUrl: "/images/news-petani.jpg",
-      date: "2025-10-28T09:15:00",
-    },
-    {
-      id: 7,
-      title:
-        "Pemerintah Beri Subsidi Pupuk Untuk Mendukung Produktivitas Petani",
-      imageUrl: "/images/news-pupuk.jpg",
-      date: "2025-10-27T14:05:00",
-    },
-    {
-      id: 8,
-      title: "Produksi Sayuran Meningkat Tajam Di Awal Musim Hujan Tahun Ini",
-      imageUrl: "/images/news-sayur.jpg",
-      date: "2025-10-25T07:45:00",
-    },
-    {
-      id: 9,
-      title: "Harga Komoditas Stabil Menjelang Natal dan Tahun Baru",
-      imageUrl: "/images/news-sayur.jpg",
-      date: "2025-10-24T10:10:00",
-    },
-  ];
-});
+// FETCH DARI API
+async function fetchNews() {
+  try {
+    const response = await axios.get("http://127.0.0.1:8000/api/berita");
+    // Mapping data API ke interface News
+    newsList.value = response.data.map((b: any) => ({
+      id: b.id_berita,
+      title: b.judul_berita,
+      imageUrl: b.gambar_berita
+        ? `http://127.0.0.1:8000/storage/${b.gambar_berita}`
+        : "/images/default-news.jpg", // fallback image
+      date: b.tanggal_publikasi,
+    }));
+  } catch (error) {
+    console.error("Gagal mengambil data berita:", error);
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+onMounted(fetchNews);
 
 // NAVIGATE DETAIL
 const goToDetail = (id: number) => {

@@ -2,9 +2,15 @@
 import { ref, onMounted } from "vue";
 import Header from "~/components/layout/Header.vue";
 import { useRoute } from "vue-router";
+import { useCartSession } from "~/composables/useCartSession";
+import { onBeforeRouteLeave } from "vue-router";
+const { cart, buyNowState, skipLeaveConfirm, enableSkipLeave, clearCart, clearBuyNow } = useCartSession();
+
+const isBuyNow = computed(() => buyNowState.value.items.length > 0);
+const isCart = computed(() => cart.value.items.length > 0);
 
 interface Product {
-  id_detail_pesanan: number;
+  id_detail_pesanan: string;
   nama_produk: string;
   foto_produk: string;
   harga_produk_tersimpan: number;
@@ -12,37 +18,104 @@ interface Product {
   kuantitas_produk: number;
 }
 
+const checkoutItems = ref([]);
+const checkoutId = ref(null);
+const mode = ref("");
+
 const { $api } = useNuxtApp();
-const route = useRoute();
-const pesananID = Number(route.params.id);
+// const route = useRoute();
+// const pesananID = Number(route.params.id);
 
 const productDetail = ref<Product[]>([]);
 
-onMounted(async () => {
-  try {
-    const res = await $api.get(`http://127.0.0.1:8000/api/user/pesanan/${pesananID}`);
+onBeforeRouteLeave((to, from) => {
+  if (skipLeaveConfirm.value) {
+    return true;
+  }
+  // Jika tidak ada session sama sekali → biarkan keluar
+  if (!isBuyNow.value && !isCart.value) return true;
 
-    if (!res.data) {
-      productDetail.value = [];
-      return;
+  const message =
+    isBuyNow.value
+      ? "Apakah Anda ingin membatalkan pesanan Buy Now?"
+      : "Apakah Anda ingin membatalkan pesanan di Keranjang?";
+
+  const confirmLeave = window.confirm(message);
+
+  if (confirmLeave) {
+    // Hapus session sesuai mode
+    if (isBuyNow.value) {
+      clearBuyNow();
     }
 
-    // backend mengembalikan:
-    // data: { detail_pesanans: [...] }
-    productDetail.value = res.data.detail_pesanans.map((item: any) => ({
-      id_detail_pesanan: item.id_detail_pesanan,
-      id_produk: item.produk.id_produk,
-      nama_produk: item.produk.nama_produk,
-      foto_produk: item.produk.foto_produk,
-      harga_produk_tersimpan: Number(item.harga_produk_tersimpan),
-      berat_produk: Number(item.produk.berat_produk),
-      kuantitas_produk: item.kuantitas_produk,
-    }));
-
-  } catch (error) {
-    console.error("Gagal memuat keranjang:", error);
+    return true; // lanjut navigasi
   }
+
+  return false; // batalkan navigasi
 });
+
+onMounted(() => {
+  if (
+    buyNowState.value &&
+    buyNowState.value.items &&
+    buyNowState.value.items.length > 0
+  ) {
+    productDetail.value = buyNowState.value.items;
+    // productDetail.value = buyNowState.value.id_pesanan;
+    mode.value = "buy";
+    return;
+  }
+
+  // Jika BUY NOW ada → tampil buy now
+  if (buyNowState.value.items && buyNowState.value.items.length > 0) {
+    productDetail.value = JSON.parse(JSON.stringify(buyNowState.value.items));
+    return;
+  }
+
+  // Jika CART ada → tampil keranjang
+  if (cart.value.items && cart.value.items.length > 0) {
+    productDetail.value = JSON.parse(JSON.stringify(cart.value.items));
+    return;
+  }
+
+  // Jika keduanya kosong
+  productDetail.value = [];
+});
+
+// onMounted(() => {
+//   if (!cartSession.value.items) {
+//     productDetail.value = [];
+//     return;
+//   }
+
+//   productDetail.value = JSON.parse(JSON.stringify(cartSession.value.items));
+// });
+
+// onMounted(async () => {
+//   try {
+//     const res = await $api.get(`http://127.0.0.1:8000/api/user/pesanan/${pesananID}`);
+
+//     if (!res.data) {
+//       productDetail.value = [];
+//       return;
+//     }
+
+//     // backend mengembalikan:
+//     // data: { detail_pesanans: [...] }
+//     productDetail.value = res.data.detail_pesanans.map((item: any) => ({
+//       id_detail_pesanan: item.id_detail_pesanan,
+//       id_produk: item.produk.id_produk,
+//       nama_produk: item.produk.nama_produk,
+//       foto_produk: item.produk.foto_produk,
+//       harga_produk_tersimpan: Number(item.harga_produk_tersimpan),
+//       berat_produk: Number(item.produk.berat_produk),
+//       kuantitas_produk: item.kuantitas_produk,
+//     }));
+
+//   } catch (error) {
+//     console.error("Gagal memuat keranjang:", error);
+//   }
+// });
 
 const totalPrice = computed(() =>
   productDetail.value.reduce(
@@ -53,14 +126,19 @@ const totalPrice = computed(() =>
 
 const checkout = async () => {
   try {
+    enableSkipLeave();
     const res = await $api.post("http://127.0.0.1:8000/api/user/pesanan/checkout", {
       // alamat_pengiriman: '{{ authStore.user?.nama }}',
-      metode_pembayaran: "QRIS",
+      items: productDetail.value
     });
 
-    const idPesanan = res.data.data.id_pesanan;
+    if (isBuyNow.value) {
+      clearBuyNow();   // hanya hapus BuyNow
+    } else if (isCart.value) {
+      clearCart();     // hanya hapus Cart
+    }
 
-    navigateTo(`/dashboard/transaksi/${idPesanan}`);
+    navigateTo(`/dashboard/transaksi/${res.data.id_pesanan}`);
   } catch (err: any) {
     console.error("Checkout gagal:", err);
   }
@@ -128,7 +206,7 @@ definePageMeta({
             <!-- KIRI: FOTO + NAMA + QTY -->
             <div class="flex items-center gap-3">
               <img
-                :src="item.foto_produk"
+                :src="'http://127.0.0.1:8000/storage/'+item.foto_produk"
                 class="w-20 h-20 object-cover rounded-md shadow-md"
                 alt="product"
               />

@@ -42,7 +42,7 @@ const filteredMenuItems = computed(() => {
           <img src="/avatar.svg" alt="" />
         </Button> -->
         <Avatar class="h-12 w-12 bg-gray-100">
-          <img src="/avatar.svg" alt="" class="rounded-full mt-2" />
+          <img :src="authStore.user?.foto_profil ? 'http://127.0.0.1:8000/storage/' + authStore.user.foto_profil : '/avatar.svg'"  alt="" class="rounded-full mt-2" />
         </Avatar>
         <span v-if="isOpen" class="hidden md:flex justify-start text-left flex-col items-start">
           <span v-if="isOpen" class="hidden text-xl font-bold lg:inline-block">{{ authStore.user?.nama || 'John Doe' }}</span>
