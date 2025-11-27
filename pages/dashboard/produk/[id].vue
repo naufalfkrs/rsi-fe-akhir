@@ -109,7 +109,7 @@ const buyNow = async () => {
         </h1>
 
         <p class="text-2xl font-semibold text-green-600 mb-5">
-          Rp {{ productDetail?.harga_produk.toLocaleString() }}
+          Rp {{ Number(productDetail?.harga_produk).toLocaleString() }}
         </p>
 
         <h1 class="font-semibold">Deskripsi Produk</h1>

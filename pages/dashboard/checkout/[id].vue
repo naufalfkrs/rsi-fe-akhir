@@ -6,6 +6,7 @@ import { useCartSession } from "~/composables/useCartSession";
 import { onBeforeRouteLeave } from "vue-router";
 const { cart, buyNowState, skipLeaveConfirm, enableSkipLeave, clearCart, clearBuyNow } = useCartSession();
 
+const authStore = useAuthStore();
 const isBuyNow = computed(() => buyNowState.value.items.length > 0);
 const isCart = computed(() => cart.value.items.length > 0);
 
@@ -176,14 +177,14 @@ definePageMeta({
           <div class="flex gap-5 mb-20">
             <!-- LEFT -->
             <div class="w-1/3">
-              <p class="font-bold text-gray-700 text-sm">Naufal Fakhri</p>
-              <p class="text-gray-600 text-sm mt-1">+62 812 3456 7890</p>
+              <p class="font-bold text-gray-700 text-sm">{{ authStore.user?.nama }}</p>
+              <p class="text-gray-600 text-sm mt-1">{{ authStore.user?.nomor_telepon }}</p>
             </div>
 
             <!-- RIGHT -->
             <div class="w-2/3">
               <p class="text-gray-700 text-sm leading-relaxed">
-                Jl. Veteran Malang No. 15, Lowokwaru, Kota Malang, Jawa Timur 65145
+                {{ authStore.user?.alamat }}
               </p>
             </div>
           </div>
@@ -224,7 +225,7 @@ definePageMeta({
             <!-- TENGAH: HARGA SATUAN -->
             <div class="flex items-center justify-end">
               <p class="text-green-600 font-semibold text-sm">
-                Rp {{ item.harga_produk_tersimpan.toLocaleString() }}
+                Rp {{ Number(item.harga_produk_tersimpan).toLocaleString() }}
               </p>
             </div>
 
