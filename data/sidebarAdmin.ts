@@ -2,13 +2,13 @@ import type { NavMenuItems } from '~/types/nav';
 
 export const sidebarItems: NavMenuItems = [
  
-  {
-    name: 'Dashboard Admin',
-    description: '',
-    icon: 'mdi:view-dashboard-outline',
-    route: '/admin',
-    type: 'header',
-  },
+  // {
+  //   name: 'Dashboard Admin',
+  //   description: '',
+  //   icon: 'mdi:view-dashboard-outline',
+  //   route: '/admin',
+  //   type: 'header',
+  // },
   {
     name: 'Produk',
     description: '',

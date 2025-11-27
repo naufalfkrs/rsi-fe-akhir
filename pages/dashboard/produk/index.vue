@@ -31,7 +31,7 @@ onMounted(async () => {
       id: p.id_produk,
       name: p.nama_produk,
       imageUrl: "http://127.0.0.1:8000/storage/" + p.foto_produk, // sesuaikan folder upload kamu
-      price: p.harga_produk,
+      price: Number(p.harga_produk),
       category: p.kategori_produk,
     }));
   } catch (error) {

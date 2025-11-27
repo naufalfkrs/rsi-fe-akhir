@@ -28,7 +28,7 @@ const login = async () => {
     authStore.setUser(user);
 
     if (user.role === 'admin') {
-      router.push('/admin/');
+      router.push('/admin/produk');
     } else if (user.role === 'pembeli') {
       router.push('/dashboard');
     } else {

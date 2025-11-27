@@ -32,7 +32,7 @@ async function fetchPesananDetail() {
       }
     );
 
-    const data = response.data.data;
+    const data = response.data;
     noTransaksi.value = data.id_pesanan; // isi nomor transaksi
   } catch (err) {
     console.error("Gagal mengambil data pesanan:", err);
@@ -87,14 +87,16 @@ async function submitAduan() {
     isiAduan.value = '';
     fotoAduan.value = null;
 
-    navigateTo('/user/komplain');
+    navigateTo('/dashboard/transaksi');
   } catch (error: any) {
     console.error(error);
     alert(error.response?.data?.message || "Gagal mengirim aduan");
+    navigateTo('/dashboard/transaksi');
   } finally {
     isSubmitting.value = false;
   }
 }
+const back = () => navigateTo(`/dashboard/transaksi/`);
 
 definePageMeta({
   middleware: "auth",

@@ -260,7 +260,7 @@ definePageMeta({
           <div
             v-for="item in productDetail?.products"
             :key="item.id"
-            class="flex gap-3 items-center ml-10"
+            class="flex gap-3 items-center ml-10 mb-2"
           >
             <!-- IMAGE -->
             <img
