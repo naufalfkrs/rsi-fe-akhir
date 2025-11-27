@@ -69,6 +69,8 @@ async function tambahProduk() {
     isSubmitting.value = false;
   }
 }
+
+const back = () => navigateTo(`/admin/produk/`);
 </script>
 
 <template>
@@ -77,6 +79,12 @@ async function tambahProduk() {
     <div :class="['flex transition-all duration-300', contentMargin]">
       <main class="flex-1 max-w-[90%] mx-auto py-10">
         <!-- Judul -->
+        <button
+          class="mr-2 mb-4 shadow-md bg-white text-gray-600 px-5 py-2 rounded-lg hover:bg-gray-400 transition"
+          @click="back"
+        >
+          &larr; Kembali
+        </button>
         <h1 class="text-3xl font-bold mb-6">Tambah Produk</h1>
 
         <!-- Baris 1: Gambar, Nama+Deskripsi, Kategori -->

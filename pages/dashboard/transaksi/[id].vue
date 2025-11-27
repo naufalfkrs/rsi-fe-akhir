@@ -24,6 +24,7 @@ interface Product {
   products: ProductItem[];
 }
 
+const authStore = useAuthStore();
 const { $api } = useNuxtApp();
 const navbar = useNavbar();
 const contentMargin = computed(() => (navbar.isOpen ? "ml-64" : "ml-20"));
@@ -43,7 +44,7 @@ onMounted(async () => {
     id: data.id_pesanan,
     status: data.status_pesanan?.toLowerCase(), // "Menunggu Pembayaran" → "menunggu"
     orderDate: data.created_at,
-    deadlineDate: data.pembayaran?.tanggal_pembayaran ?? null,
+    deadlineDate: getDeadlinePlusOneHour(data.created_at),
 
     products: data.detail_pesanans.map((item: any) => ({
       id: item.id_detail_pesanan,
@@ -95,6 +96,11 @@ const formatOrderDate = (dateStr: string | undefined) => {
   return `${tgl}, ${jam} WIB`;
 };
 
+const getDeadlinePlusOneHour = (dateStr: string) => {
+  const date = new Date(dateStr);
+  date.setHours(date.getHours() + 1); // tambah 1 jam
+  return date.toISOString();
+};
 
 const formatDeadline = (dateStr: string | undefined) => {
   if (!dateStr) return "-";
@@ -173,12 +179,12 @@ definePageMeta({
           </p>
           <!-- 2 COL — USER INFO -->
           <div class="space-y-2">
-            <div v-if="productDetail?.status === 'menunggu'" class="flex">
+            <div class="flex">
               <p class="w-40 font-semibold text-gray-700 text-sm">
                 Batas Pembayaran
               </p>
               <p class="text-gray-600 text-sm">
-                : {{ formatDeadline(productDetail?.deadlineDate) }}
+                : {{ formatOrderDate(productDetail?.deadlineDate) }}
               </p>
             </div>
 
@@ -187,7 +193,7 @@ definePageMeta({
                 No. Pesanan
               </p>
               <p class="text-gray-600 text-sm">
-                : INV-{{ Math.floor(Math.random() * 900000) + 100000 }}
+                : INV-{{ productDetail?.id }}
               </p>
             </div>
 
@@ -236,19 +242,14 @@ definePageMeta({
           <div class="flex gap-5">
             <!-- LEFT -->
             <div class="w-1/3">
-              <p class="font-bold text-gray-700 text-sm">Naufal Fakhri</p>
-              <p class="text-gray-600 text-sm mt-1">+62 812 3456 7890</p>
+              <p class="font-bold text-gray-700 text-sm">{{ authStore.user?.nama }}</p>
+              <p class="text-gray-600 text-sm mt-1">{{ authStore.user?.nomor_telepon }}</p>
             </div>
 
             <!-- RIGHT -->
             <div class="w-2/3">
               <p class="text-gray-700 text-sm leading-relaxed">
-                Jl. Veteran Malang No. 15, Lowokwaru, Kota Malang, Jawa Timur
-                65145 Jl. Veteran Malang No. 15, Lowokwaru, Kota Malang, Jawa
-                Timur 65145 Jl. Veteran Malang No. 15, Lowokwaru, Kota Malang,
-                Jawa Timur 65145 Jl. Veteran Malang No. 15, Lowokwaru, Kota
-                Malang, Jawa Timur 65145 Jl. Veteran Malang No. 15, Lowokwaru,
-                Kota Malang, Jawa Timur 65145
+                {{ authStore.user?.alamat }}
               </p>
             </div>
           </div>

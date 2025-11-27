@@ -73,6 +73,10 @@ const filteredKomplain = computed(() => {
   });
 });
 
+const detail = (id: number) => {
+  navigateTo(`/admin/aduan/${id}`);
+};
+
 definePageMeta({
   middleware: "auth",
 });
@@ -132,7 +136,8 @@ definePageMeta({
                   </span>
                 </td>
                 <td class="px-6 py-4">
-                  <button class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition">
+                  <button class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
+                  @click="detail(item.id_komplain)">
                     Lihat Detail
                   </button>
                 </td>

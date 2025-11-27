@@ -84,6 +84,8 @@ async function updateBerita() {
     isSubmitting.value = false;
   }
 }
+const back = () => navigateTo(`/admin/berita/`);
+
 </script>
 
 <template>
@@ -91,6 +93,12 @@ async function updateBerita() {
     <Sidebar />
     <div :class="['flex transition-all duration-300', contentMargin]">
       <main class="flex-1 max-w-[90%] mx-auto py-10">
+        <button
+          class="mr-2 mb-4 shadow-md bg-white text-gray-600 px-5 py-2 rounded-lg hover:bg-gray-400 transition"
+          @click="back"
+        >
+          &larr; Kembali
+        </button>
         <h1 class="text-3xl font-bold mb-6">Ubah Berita</h1>
 
         <div v-if="isLoading" class="text-gray-500">Memuat data berita...</div>
